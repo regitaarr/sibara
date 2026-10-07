@@ -32,214 +32,137 @@
     <!-- ─── Page Content ────────────────────────────────────────── -->
     <main class="page-content">
 
-        <!-- ─── Tambah Pengguna ─────────────────────────────────── -->
-        <div class="card-bmn" id="card-add-user">
-            <div class="card-title"><i class="bi bi-person-plus me-1"></i>Tambah Akun Pengguna</div>
+        <main class="page-content">
 
-            <div id="add-alert" class="alert py-2 d-none mb-3"></div>
-
-            <form id="form-add-user" novalidate>
-
-                <div class="mb-3">
-                    <label class="form-label" for="add-nama">Nama Lengkap</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent"><i class="bi bi-person text-muted"></i></span>
-                        <input type="text" id="add-nama" class="form-control" placeholder="Nama lengkap pengguna"
-                            required>
+            <!-- ─── Daftar Pengguna ─────────────────────────────────── -->
+            <div class="card-bmn">
+                <div class="section-header">
+                    <h6><i class="bi bi-people me-1"></i>Daftar Pengguna</h6>
+                    <button class="btn-bmn-secondary px-2 py-1" id="btn-refresh" title="Refresh">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+                <div id="users-list">
+                    <div class="empty-state">
+                        <i class="bi bi-hourglass"></i>
+                        <p>Memuat data pengguna...</p>
                     </div>
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <label class="form-label" for="add-email">Email</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent"><i class="bi bi-envelope text-muted"></i></span>
-                        <input type="email" id="add-email" class="form-control" placeholder="email@instansi.go.id"
-                            autocomplete="off" required>
+        </main>
+
+        <!-- ─── Bottom Nav ──────────────────────────────────────────── -->
+        <nav class="bottom-nav">
+            <a href="dashboard.html">
+                <i class="bi bi-upc-scan"></i>Input
+            </a>
+            <a href="rekap.html">
+                <i class="bi bi-bar-chart-line"></i>Rekap
+            </a>
+            <a href="users.html" class="active">
+                <i class="bi bi-people"></i>Pengguna
+            </a>
+        </nav>
+
+        <!-- ─── Edit Role Modal ─────────────────────────────────────── -->
+        <div class="modal modal-bmn fade" id="modal-role" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered mx-3">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Role</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label" for="add-password">Password</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent"><i class="bi bi-lock text-muted"></i></span>
-                        <input type="password" id="add-password" class="form-control border-end-0"
-                            placeholder="Min. 6 karakter" autocomplete="new-password" required>
-                        <button type="button" id="toggle-add-pass" class="input-group-text bg-transparent"
-                            title="Tampilkan password">
-                            <i class="bi bi-eye text-muted" id="add-eye-icon"></i>
+                    <div class="modal-body">
+                        <p class="fs-sm text-muted mb-1">Akun: <strong id="modal-email"></strong></p>
+                        <p class="fs-sm text-muted mb-3">Nama: <strong id="modal-nama"></strong></p>
+                        <label class="form-label">Role</label>
+                        <select id="modal-role-select" class="form-select">
+                            <option value="user">User — Lihat, tambah, edit, download Excel</option>
+                            <option value="admin">Admin — Akses penuh (hapus data &amp; kelola pengguna)</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+                        <button class="btn btn-primary btn-sm px-4" id="btn-save-role">
+                            <i class="bi bi-check2 me-1"></i>Simpan
                         </button>
                     </div>
-                    <div class="form-text">Minimal 6 karakter. Pengguna dapat mengubah password via "Lupa Password".
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── Reset Password Modal ────────────────────────────────── -->
+        <div class="modal modal-bmn fade" id="modal-reset-pw" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered mx-3">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-key me-2"></i>Reset Password</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="fs-sm text-muted mb-3">
+                            Kirim link reset password ke email <strong id="modal-reset-email"></strong>?
+                        </p>
+                        <p class="fs-sm text-muted">
+                            Pengguna akan menerima email berisi link untuk membuat password baru.
+                        </p>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+                        <button class="btn btn-warning btn-sm px-4" id="btn-confirm-reset">
+                            <i class="bi bi-send me-1"></i>Kirim Email Reset
+                        </button>
                     </div>
                 </div>
-
-                <div class="mb-4">
-                    <label class="form-label">Role</label>
-                    <div class="jenis-toggle" style="max-width:280px">
-                        <input type="radio" id="role-user" name="add-role" value="user" checked>
-                        <label for="role-user"><i class="bi bi-person me-1"></i>User</label>
-
-                        <input type="radio" id="role-admin" name="add-role" value="admin">
-                        <label for="role-admin"><i class="bi bi-shield-check me-1"></i>Admin</label>
-                    </div>
-                    <div class="form-text mt-1">
-                        <span style="color:var(--primary-lt)"><i class="bi bi-person me-1"></i>User:</span> Lihat,
-                        tambah, edit, download Excel.<br>
-                        <span style="color:var(--danger)"><i class="bi bi-shield-check me-1"></i>Admin:</span> Akses
-                        penuh termasuk hapus data &amp; kelola pengguna.
-                    </div>
-                </div>
-
-                <button type="submit" id="btn-add" class="btn-bmn-primary">
-                    <span class="btn-text"><i class="bi bi-person-plus-fill me-1"></i>Buat Akun &amp; Simpan</span>
-                    <span class="spinner d-none" id="spin-add"></span>
-                </button>
-            </form>
-        </div>
-
-        <!-- ─── Daftar Pengguna ─────────────────────────────────── -->
-        <div class="card-bmn">
-            <div class="section-header">
-                <h6><i class="bi bi-people me-1"></i>Daftar Pengguna</h6>
-                <button class="btn-bmn-secondary px-2 py-1" id="btn-refresh" title="Refresh">
-                    <i class="bi bi-arrow-clockwise"></i>
-                </button>
-            </div>
-            <div id="users-list">
-                <div class="empty-state">
-                    <i class="bi bi-hourglass"></i>
-                    <p>Memuat data pengguna...</p>
-                </div>
             </div>
         </div>
 
-    </main>
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- ─── Bottom Nav ──────────────────────────────────────────── -->
-    <nav class="bottom-nav">
-        <a href="dashboard.html">
-            <i class="bi bi-upc-scan"></i>Input
-        </a>
-        <a href="rekap.html">
-            <i class="bi bi-bar-chart-line"></i>Rekap
-        </a>
-        <a href="users.html" class="active">
-            <i class="bi bi-people"></i>Pengguna
-        </a>
-    </nav>
+        <script type="module">
+            import { requireAuth, logoutUser, sendResetEmail } from "./js/auth.js";
+            import { db } from "./js/firebase-config.js";
+            import { loadUsers, addUserRecord, updateUserRole, toggleUserStatus, deleteUserRecord } from "./js/users.js";
 
-    <!-- ─── Edit Role Modal ─────────────────────────────────────── -->
-    <div class="modal modal-bmn fade" id="modal-role" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered mx-3">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Role</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="fs-sm text-muted mb-1">Akun: <strong id="modal-email"></strong></p>
-                    <p class="fs-sm text-muted mb-3">Nama: <strong id="modal-nama"></strong></p>
-                    <label class="form-label">Role</label>
-                    <select id="modal-role-select" class="form-select">
-                        <option value="user">User — Lihat, tambah, edit, download Excel</option>
-                        <option value="admin">Admin — Akses penuh (hapus data &amp; kelola pengguna)</option>
-                    </select>
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
-                    <button class="btn btn-primary btn-sm px-4" id="btn-save-role">
-                        <i class="bi bi-check2 me-1"></i>Simpan
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+            // Firebase Auth imports for secondary app creation
+            import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+            import {
+                getAuth,
+                createUserWithEmailAndPassword,
+                signOut as secondarySignOut
+            } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    <!-- ─── Reset Password Modal ────────────────────────────────── -->
-    <div class="modal modal-bmn fade" id="modal-reset-pw" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered mx-3">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-key me-2"></i>Reset Password</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="fs-sm text-muted mb-3">
-                        Kirim link reset password ke email <strong id="modal-reset-email"></strong>?
-                    </p>
-                    <p class="fs-sm text-muted">
-                        Pengguna akan menerima email berisi link untuk membuat password baru.
-                    </p>
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
-                    <button class="btn btn-warning btn-sm px-4" id="btn-confirm-reset">
-                        <i class="bi bi-send me-1"></i>Kirim Email Reset
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script type="module">
-        import { requireAuth, logoutUser, sendResetEmail } from "./js/auth.js";
-        import { db } from "./js/firebase-config.js";
-        import { loadUsers, addUserRecord, updateUserRole, toggleUserStatus, deleteUserRecord } from "./js/users.js";
-
-        // Firebase Auth imports for secondary app creation
-        import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import {
-            getAuth,
-            createUserWithEmailAndPassword,
-            signOut as secondarySignOut
-        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-        // ─── Toast helper ─────────────────────────────────────────────
-        function showToast(msg, type = "success") {
-            const el = document.createElement("div");
-            el.className = `toast-bmn ${type}`;
-            el.innerHTML = `<i class="bi bi-${type === "success" ? "check-circle" : type === "error" ? "x-circle" : "exclamation-triangle"} me-2"></i>${msg}`;
-            document.getElementById("toast-container").appendChild(el);
-            setTimeout(() => el.remove(), 5000);
-        }
-
-        // ─── Auth guard (admin only) ──────────────────────────────
-        try {
-            const { role } = await requireAuth("admin");
-
-            // Sembunyikan form tambah pengguna jika role adalah admin (misalnya hanya superadmin yang boleh)
-            if (role === "admin") {
-                document.getElementById("card-add-user").classList.add("d-none");
+            // ─── Toast helper ─────────────────────────────────────────────
+            function showToast(msg, type = "success") {
+                const el = document.createElement("div");
+                el.className = `toast-bmn ${type}`;
+                el.innerHTML = `<i class="bi bi-${type === "success" ? "check-circle" : type === "error" ? "x-circle" : "exclamation-triangle"} me-2"></i>${msg}`;
+                document.getElementById("toast-container").appendChild(el);
+                setTimeout(() => el.remove(), 5000);
             }
-        } catch (_) { }
 
-        document.getElementById("btn-logout").addEventListener("click", () => {
-            if (confirm("Keluar dari aplikasi?")) logoutUser();
-        });
-
-        // ─── Toggle password visibility ───────────────────────────
-        document.getElementById("toggle-add-pass").addEventListener("click", () => {
-            const inp = document.getElementById("add-password");
-            const icon = document.getElementById("add-eye-icon");
-            const isHidden = inp.type === "password";
-            inp.type = isHidden ? "text" : "password";
-            icon.className = isHidden ? "bi bi-eye-slash text-muted" : "bi bi-eye text-muted";
-        });
-
-        // ─── Load & render users ──────────────────────────────────
-        async function renderUsers() {
-            const container = document.getElementById("users-list");
-            container.innerHTML = `<div class="empty-state"><i class="bi bi-hourglass"></i><p>Memuat...</p></div>`;
+            // ─── Auth guard (admin only) ──────────────────────────────
             try {
-                const users = await loadUsers();
-                if (!users.length) {
-                    container.innerHTML = `<div class="empty-state"><i class="bi bi-inbox"></i><p>Belum ada pengguna.</p></div>`;
-                    return;
-                }
-                container.innerHTML = users.map(u => `
+                await requireAuth("admin");
+            } catch (_) { }
+
+            document.getElementById("btn-logout").addEventListener("click", () => {
+                if (confirm("Keluar dari aplikasi?")) logoutUser();
+            });
+
+            // ─── Load & render users ──────────────────────────────────
+            async function renderUsers() {
+                const container = document.getElementById("users-list");
+                container.innerHTML = `<div class="empty-state"><i class="bi bi-hourglass"></i><p>Memuat...</p></div>`;
+                try {
+                    const users = await loadUsers();
+                    if (!users.length) {
+                        container.innerHTML = `<div class="empty-state"><i class="bi bi-inbox"></i><p>Belum ada pengguna.</p></div>`;
+                        return;
+                    }
+                    container.innerHTML = users.map(u => `
         <div class="d-flex align-items-start justify-content-between py-2 border-bottom gap-2">
           <div class="flex-grow-1 overflow-hidden">
             <div class="fw-600 text-truncate">${u.nama || "—"}</div>
@@ -275,169 +198,83 @@
           </div>
         </div>
       `).join("");
-            } catch (err) {
-                container.innerHTML = `<div class="empty-state text-danger"><i class="bi bi-x-circle"></i><p>${err.message}</p></div>`;
-            }
-        }
-
-        renderUsers();
-        document.getElementById("btn-refresh").addEventListener("click", renderUsers);
-
-        // ─── Create Firebase Auth account via SECONDARY app ──────
-        // This avoids signing the admin out when creating a new user.
-        async function createAuthAccountSecondary(email, password) {
-            // Get firebase config from the primary app
-            const primaryApp = (await import("./js/firebase-config.js")).auth.app;
-            const primaryConfig = primaryApp.options;
-
-            // Initialize a temporary secondary app with a unique name
-            const secondaryAppName = `secondary-${Date.now()}`;
-            const secondaryApp = initializeApp(primaryConfig, secondaryAppName);
-            const secondaryAuth = getAuth(secondaryApp);
-
-            try {
-                const credential = await createUserWithEmailAndPassword(secondaryAuth, email, password);
-                const uid = credential.user.uid;
-                // Sign out from secondary so no dangling session
-                await secondarySignOut(secondaryAuth);
-                return uid;
-            } finally {
-                // Always delete the secondary app instance
-                await deleteApp(secondaryApp);
-            }
-        }
-
-        // ─── Form: add user ───────────────────────────────────────
-        document.getElementById("form-add-user").addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const nama = document.getElementById("add-nama").value.trim();
-            const email = document.getElementById("add-email").value.trim().toLowerCase();
-            const password = document.getElementById("add-password").value;
-            const role = document.querySelector('input[name="add-role"]:checked').value;
-            const alertEl = document.getElementById("add-alert");
-            alertEl.classList.add("d-none");
-
-            // Validation
-            if (!nama || !email || !password) {
-                alertEl.textContent = "Semua field wajib diisi.";
-                alertEl.className = "alert alert-warning py-2 mb-3";
-                alertEl.classList.remove("d-none");
-                return;
-            }
-            if (password.length < 6) {
-                alertEl.textContent = "Password minimal 6 karakter.";
-                alertEl.className = "alert alert-warning py-2 mb-3";
-                alertEl.classList.remove("d-none");
-                return;
-            }
-
-            const btn = document.getElementById("btn-add");
-            const spin = document.getElementById("spin-add");
-            btn.disabled = true;
-            spin.classList.remove("d-none");
-            btn.querySelector(".btn-text").classList.add("d-none");
-
-            try {
-                // 1. Create Firebase Auth account via secondary app
-                await createAuthAccountSecondary(email, password);
-
-                // 2. Save user record to Firestore
-                await addUserRecord({ nama, email, role });
-
-                showToast(`Akun "${nama}" berhasil dibuat dengan role ${role}!`);
-                document.getElementById("form-add-user").reset();
-                // Reset radio to default
-                document.getElementById("role-user").checked = true;
-                renderUsers();
-            } catch (err) {
-                let msg = err.message || "Gagal membuat akun.";
-                if (err.code === "auth/email-already-in-use") {
-                    msg = "Email sudah terdaftar di Firebase Authentication. Gunakan email lain atau tambahkan hanya data Firestore-nya.";
-                } else if (err.code === "auth/invalid-email") {
-                    msg = "Format email tidak valid.";
-                } else if (err.code === "auth/weak-password") {
-                    msg = "Password terlalu lemah. Gunakan minimal 6 karakter.";
+                } catch (err) {
+                    container.innerHTML = `<div class="empty-state text-danger"><i class="bi bi-x-circle"></i><p>${err.message}</p></div>`;
                 }
-                alertEl.innerHTML = `<i class="bi bi-x-circle me-1"></i>${msg}`;
-                alertEl.className = "alert alert-danger py-2 mb-3";
-                alertEl.classList.remove("d-none");
-            } finally {
-                btn.disabled = false;
-                spin.classList.add("d-none");
-                btn.querySelector(".btn-text").classList.remove("d-none");
             }
-        });
 
-        // ─── Edit role modal ──────────────────────────────────────
-        let editingEmail = null;
-        const modalRole = new bootstrap.Modal(document.getElementById("modal-role"));
+            renderUsers();
+            document.getElementById("btn-refresh").addEventListener("click", renderUsers);
 
-        window.openRoleModal = function (email, nama, currentRole) {
-            editingEmail = email;
-            document.getElementById("modal-email").textContent = email;
-            document.getElementById("modal-nama").textContent = nama;
-            document.getElementById("modal-role-select").value = currentRole;
-            modalRole.show();
-        };
+            // ─── Edit role modal ──────────────────────────────────────
+            let editingEmail = null;
+            const modalRole = new bootstrap.Modal(document.getElementById("modal-role"));
 
-        document.getElementById("btn-save-role").addEventListener("click", async () => {
-            const newRole = document.getElementById("modal-role-select").value;
-            try {
-                await updateUserRole(editingEmail, newRole);
-                modalRole.hide();
-                showToast("Role berhasil diperbarui!");
-                renderUsers();
-            } catch (err) {
-                showToast("Gagal memperbarui role: " + err.message, "error");
-            }
-        });
+            window.openRoleModal = function (email, nama, currentRole) {
+                editingEmail = email;
+                document.getElementById("modal-email").textContent = email;
+                document.getElementById("modal-nama").textContent = nama;
+                document.getElementById("modal-role-select").value = currentRole;
+                modalRole.show();
+            };
 
-        // ─── Reset password modal ────────────────────────────────
-        let resetTargetEmail = null;
-        const modalResetPw = new bootstrap.Modal(document.getElementById("modal-reset-pw"));
+            document.getElementById("btn-save-role").addEventListener("click", async () => {
+                const newRole = document.getElementById("modal-role-select").value;
+                try {
+                    await updateUserRole(editingEmail, newRole);
+                    modalRole.hide();
+                    showToast("Role berhasil diperbarui!");
+                    renderUsers();
+                } catch (err) {
+                    showToast("Gagal memperbarui role: " + err.message, "error");
+                }
+            });
 
-        window.openResetModal = function (email) {
-            resetTargetEmail = email;
-            document.getElementById("modal-reset-email").textContent = email;
-            modalResetPw.show();
-        };
+            // ─── Reset password modal ────────────────────────────────
+            let resetTargetEmail = null;
+            const modalResetPw = new bootstrap.Modal(document.getElementById("modal-reset-pw"));
 
-        document.getElementById("btn-confirm-reset").addEventListener("click", async () => {
-            try {
-                await sendResetEmail(resetTargetEmail);
-                modalResetPw.hide();
-                showToast(`Email reset password telah dikirim ke ${resetTargetEmail}.`);
-            } catch (err) {
-                showToast("Gagal mengirim email reset: " + err.message, "error");
-            }
-        });
+            window.openResetModal = function (email) {
+                resetTargetEmail = email;
+                document.getElementById("modal-reset-email").textContent = email;
+                modalResetPw.show();
+            };
 
-        // ─── Toggle status ────────────────────────────────────────
-        window.handleToggleStatus = async function (email, currentStatus) {
-            const label = currentStatus ? "nonaktifkan" : "aktifkan";
-            if (!confirm(`${label.charAt(0).toUpperCase() + label.slice(1)} akun ${email}?`)) return;
-            try {
-                await toggleUserStatus(email, currentStatus);
-                showToast(`Akun berhasil di${label}kan!`);
-                renderUsers();
-            } catch (err) {
-                showToast("Gagal mengubah status: " + err.message, "error");
-            }
-        };
+            document.getElementById("btn-confirm-reset").addEventListener("click", async () => {
+                try {
+                    await sendResetEmail(resetTargetEmail);
+                    modalResetPw.hide();
+                    showToast(`Email reset password telah dikirim ke ${resetTargetEmail}.`);
+                } catch (err) {
+                    showToast("Gagal mengirim email reset: " + err.message, "error");
+                }
+            });
 
-        // ─── Delete user ─────────────────────────────────────────
-        window.handleDeleteUser = async function (email, nama) {
-            if (!confirm(`Hapus pengguna "${nama}" (${email}) secara permanen?\n\nCatatan: akun Firebase Authentication tidak ikut terhapus — hapus manual di Firebase Console jika diperlukan.`)) return;
-            try {
-                await deleteUserRecord(email);
-                showToast(`Pengguna "${nama}" berhasil dihapus.`);
-                renderUsers();
-            } catch (err) {
-                showToast("Gagal menghapus pengguna: " + err.message, "error");
-            }
-        };
-    </script>
+            // ─── Toggle status ────────────────────────────────────────
+            window.handleToggleStatus = async function (email, currentStatus) {
+                const label = currentStatus ? "nonaktifkan" : "aktifkan";
+                if (!confirm(`${label.charAt(0).toUpperCase() + label.slice(1)} akun ${email}?`)) return;
+                try {
+                    await toggleUserStatus(email, currentStatus);
+                    showToast(`Akun berhasil di${label}kan!`);
+                    renderUsers();
+                } catch (err) {
+                    showToast("Gagal mengubah status: " + err.message, "error");
+                }
+            };
+
+            // ─── Delete user ─────────────────────────────────────────
+            window.handleDeleteUser = async function (email, nama) {
+                if (!confirm(`Hapus pengguna "${nama}" (${email}) secara permanen?\n\nCatatan: akun Firebase Authentication tidak ikut terhapus — hapus manual di Firebase Console jika diperlukan.`)) return;
+                try {
+                    await deleteUserRecord(email);
+                    showToast(`Pengguna "${nama}" berhasil dihapus.`);
+                    renderUsers();
+                } catch (err) {
+                    showToast("Gagal menghapus pengguna: " + err.message, "error");
+                }
+            };
+        </script>
 
 </body>
 
