@@ -195,19 +195,21 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Satuan</label>
-                            <select id="edit-barang-satuan" class="form-select" required>
-                                <option value="buah">buah</option>
-                                <option value="rim">rim</option>
-                                <option value="kotak">kotak</option>
-                                <option value="lusin">lusin</option>
-                                <option value="pak">pak</option>
-                                <option value="unit">unit</option>
-                                <option value="set">set</option>
-                                <option value="lembar">lembar</option>
-                                <option value="botol">botol</option>
-                                <option value="kg">kg</option>
-                                <option value="liter">liter</option>
-                            </select>
+                            <input type="text" id="edit-barang-satuan" class="form-control" list="satuan-options"
+                                placeholder="Pilih atau ketik satuan..." required>
+                            <datalist id="satuan-options">
+                                <option value="Buah"></option>
+                                <option value="Rim"></option>
+                                <option value="Kotak"></option>
+                                <option value="Lusin"></option>
+                                <option value="Pak"></option>
+                                <option value="Unit"></option>
+                                <option value="Set"></option>
+                                <option value="Lembar"></option>
+                                <option value="Botol"></option>
+                                <option value="Kg"></option>
+                                <option value="Liter"></option>
+                            </datalist>
                         </div>
                     </form>
                 </div>
