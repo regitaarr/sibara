@@ -33,7 +33,7 @@
     <main class="page-content">
 
         <!-- ─── Tambah Pengguna ─────────────────────────────────── -->
-        <div class="card-bmn">
+        <div class="card-bmn" id="card-add-user">
             <div class="card-title"><i class="bi bi-person-plus me-1"></i>Tambah Akun Pengguna</div>
 
             <div id="add-alert" class="alert py-2 d-none mb-3"></div>
@@ -208,7 +208,12 @@
 
         // ─── Auth guard (admin only) ──────────────────────────────
         try {
-            await requireAuth("admin");
+            const { role } = await requireAuth("admin");
+
+            // Sembunyikan form tambah pengguna jika role adalah admin (misalnya hanya superadmin yang boleh)
+            if (role === "admin") {
+                document.getElementById("card-add-user").classList.add("d-none");
+            }
         } catch (_) { }
 
         document.getElementById("btn-logout").addEventListener("click", () => {
