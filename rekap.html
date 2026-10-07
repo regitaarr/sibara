@@ -328,7 +328,7 @@
 
             // Prev
             html += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link text-dark" href="#" data-page="${currentPage - 1}">Previous</a>
+                <a class="page-link text-dark" href="#" data-page="${currentPage - 1}">&lt;</a>
             </li>`;
 
             // Calculate visible pages (show max 5 surrounding pages to prevent overflow)
@@ -346,7 +346,7 @@
 
             // Next
             html += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link text-dark" href="#" data-page="${currentPage + 1}">Next</a>
+                <a class="page-link text-dark" href="#" data-page="${currentPage + 1}">&gt;</a>
             </li>`;
 
             html += `</ul></nav>`;
