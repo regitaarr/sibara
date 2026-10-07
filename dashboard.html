@@ -41,27 +41,36 @@
     <!-- ─── Page Content ────────────────────────────────────────── -->
     <main class="page-content">
 
-        <!-- Scanner Card -->
+        <!-- Input Card -->
         <div class="card-bmn">
-            <div class="card-title"><i class="bi bi-qr-code-scan"></i> Pindai Barcode</div>
+            <div class="card-title"><i class="bi bi-upc-scan"></i> Input Barcode Barang</div>
 
-            <div id="scanner-container" class="mb-3">
-                <div id="reader"></div>
+            <!-- Manual input as PRIMARY -->
+            <div class="d-flex gap-2 mb-3">
+                <input type="text" id="manual-barcode" class="form-control form-control-lg fw-bold text-center"
+                    placeholder="Ketik kode barcode..." inputmode="numeric" autofocus>
+                <button id="btn-manual" class="btn-bmn-primary px-4 text-nowrap">
+                    <i class="bi bi-search me-1"></i>Cek
+                </button>
+            </div>
+
+            <div class="text-center">
+                <button id="btn-toggle-scanner" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    <i class="bi bi-camera me-1"></i> Aktifkan Scanner Kamera
+                </button>
+            </div>
+
+            <!-- Scanner container, hidden initially -->
+            <div id="scanner-wrapper" class="d-none mt-3">
+                <div id="scanner-container" class="mb-2">
+                    <div id="reader"></div>
+                </div>
+                <button id="btn-close-scanner" class="btn btn-sm btn-outline-danger w-100">Tutup Kamera</button>
             </div>
 
             <!-- Camera error fallback -->
-            <div id="camera-error" class="alert alert-warning py-2 d-none mb-3">
-                <i class="bi bi-exclamation-triangle me-1"></i>
-                Kamera tidak tersedia. Gunakan input manual.
-            </div>
-
-            <!-- Manual input -->
-            <div class="d-flex gap-2">
-                <input type="text" id="manual-barcode" class="form-control" placeholder="Ketik kode barcode manual..."
-                    inputmode="numeric">
-                <button id="btn-manual" class="btn-bmn-secondary px-3 text-nowrap">
-                    <i class="bi bi-search me-1"></i>Cek
-                </button>
+            <div id="camera-error" class="alert alert-warning py-2 d-none mt-3 fs-sm">
+                <i class="bi bi-exclamation-triangle me-1"></i> Kamera tidak tersedia. Pindai manual.
             </div>
         </div>
 
@@ -178,7 +187,7 @@
     <!-- ─── Bottom Nav ──────────────────────────────────────────── -->
     <nav class="bottom-nav">
         <a href="dashboard.html" class="active">
-            <i class="bi bi-qr-code-scan"></i>Scanner
+            <i class="bi bi-upc-scan"></i>Input
         </a>
         <a href="rekap.html">
             <i class="bi bi-bar-chart-line"></i>Rekap
@@ -233,12 +242,23 @@
             await handleBarcode(barcode.trim());
         }
 
-        // ─── Init scanner ─────────────────────────────────────────────
-        try {
-            await initScanner("reader", onBarcodeDetected);
-        } catch (err) {
-            document.getElementById("camera-error").classList.remove("d-none");
-        }
+        // ─── Scanner toggles ──────────────────────────────────────────
+        document.getElementById("btn-toggle-scanner").addEventListener("click", async () => {
+            document.getElementById("scanner-wrapper").classList.remove("d-none");
+            document.getElementById("btn-toggle-scanner").classList.add("d-none");
+            try {
+                await initScanner("reader", onBarcodeDetected);
+            } catch (err) {
+                document.getElementById("camera-error").classList.remove("d-none");
+                document.getElementById("scanner-wrapper").classList.add("d-none");
+            }
+        });
+
+        document.getElementById("btn-close-scanner").addEventListener("click", async () => {
+            await stopScanner();
+            document.getElementById("scanner-wrapper").classList.add("d-none");
+            document.getElementById("btn-toggle-scanner").classList.remove("d-none");
+        });
 
         // ─── Manual barcode check ─────────────────────────────────────
         document.getElementById("btn-manual").addEventListener("click", async () => {
@@ -325,10 +345,14 @@
         // ─── Scan reset ───────────────────────────────────────────────
         document.getElementById("btn-reset-scan").addEventListener("click", async () => {
             resetUI();
-            try {
-                await restartScanner("reader", onBarcodeDetected);
-            } catch (err) {
-                document.getElementById("camera-error").classList.remove("d-none");
+            if (!document.getElementById("scanner-wrapper").classList.contains("d-none")) {
+                try {
+                    await restartScanner("reader", onBarcodeDetected);
+                } catch (err) {
+                    document.getElementById("camera-error").classList.remove("d-none");
+                }
+            } else {
+                document.getElementById("manual-barcode").focus();
             }
         });
 
@@ -416,10 +440,15 @@
 
                 showToast(`Transaksi ${jenis} berhasil disimpan! Stok diperbarui.`);
                 resetUI();
-                // Restart camera
-                try {
-                    await restartScanner("reader", onBarcodeDetected);
-                } catch (_) { }
+
+                // Restart camera only if active
+                if (!document.getElementById("scanner-wrapper").classList.contains("d-none")) {
+                    try {
+                        await restartScanner("reader", onBarcodeDetected);
+                    } catch (_) { }
+                } else {
+                    document.getElementById("manual-barcode").focus();
+                }
             } catch (err) {
                 errorEl.textContent = err.message || "Gagal menyimpan transaksi. Coba lagi.";
                 errorEl.classList.remove("d-none");
