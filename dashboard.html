@@ -45,10 +45,10 @@
         <div class="card-bmn">
             <div class="card-title"><i class="bi bi-upc-scan"></i> Input Barcode Barang</div>
 
-            <!-- Manual input as PRIMARY -->
             <div class="d-flex gap-2 mb-3">
                 <input type="text" id="manual-barcode" class="form-control form-control-lg fw-bold text-center"
-                    placeholder="Ketik kode barcode..." inputmode="numeric" autofocus>
+                    placeholder="Ketik kode atau cari nama barang..." list="barang-options" autofocus>
+                <datalist id="barang-options"></datalist>
                 <button id="btn-manual" class="btn-bmn-primary px-4 text-nowrap">
                     <i class="bi bi-search me-1"></i>Cek
                 </button>
@@ -205,6 +205,7 @@
         import { requireAuth, logoutUser, applyRoleUI } from "./js/auth.js";
         import { initScanner, stopScanner, restartScanner, getBarangByBarcode, unlockScanner } from "./js/scanner.js";
         import { getBase64Photo, saveTransaksi, saveMasterBarang } from "./js/transaction.js";
+        import { listenStok } from "./js/rekap.js";
 
         // ─── Toast helper ─────────────────────────────────────────────
         function showToast(msg, type = "success") {
@@ -231,6 +232,14 @@
             document.getElementById("user-display").textContent = user.email;
             applyRoleUI(role);
         } catch (_) { /* redirected */ }
+
+        // ─── Load Barang Options for Search ───────────────────────────
+        listenStok((items) => {
+            const datalist = document.getElementById("barang-options");
+            if (datalist) {
+                datalist.innerHTML = items.map(item => `<option value="${item.id}">${item.nama_barang || "Tanpa Nama"}</option>`).join("");
+            }
+        });
 
         // ─── Logout ───────────────────────────────────────────────────
         document.getElementById("btn-logout").addEventListener("click", () => {
