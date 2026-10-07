@@ -1,4 +1,4 @@
-import { requireAuth, logoutUser, applyRoleUI } from "./auth.js";
+import { requireAuth, logoutUser, applyRoleUI } from "./auth.js?v=2";
 import { db } from "./firebase-config.js";
 import { doc, getDoc, updateDoc, writeBatch, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, updateProfile, updatePassword, updateEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
