@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Saya — Sistem BMN</title>
+    <meta name="description" content="Profil Pengguna Sistem BMN">
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- ─── Topbar ─────────────────────────────────────────────── -->
+    <header class="topbar">
+        <div class="brand">
+            <img src="assets/bps.png" alt="BPS" style="height: 24px; margin-right: 8px;"> Profil
+        </div>
+        <button class="btn-icon" id="btn-logout-header" title="Keluar">
+            <i class="bi bi-box-arrow-right"></i>
+        </button>
+    </header>
+
+    <!-- ─── Page Content ────────────────────────────────────────── -->
+    <main class="page-content">
+
+        <div class="card-bmn">
+            <div class="section-header">
+                <h6><i class="bi bi-person-lines-fill me-1"></i>Informasi Akun</h6>
+            </div>
+
+            <div id="profil-alert" class="alert d-none mb-3 py-2"></div>
+
+            <form id="form-profil">
+                <div class="mb-3">
+                    <label class="form-label text-muted fs-sm">Email (readonly)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-envelope text-muted"></i></span>
+                        <input type="email" id="profil-email" class="form-control" readonly disabled>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="profil-nama">Nama Lengkap</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent"><i class="bi bi-person text-muted"></i></span>
+                        <input type="text" id="profil-nama" class="form-control" placeholder="Nama ..." required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="profil-password">Password Baru (opsional)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent"><i class="bi bi-lock text-muted"></i></span>
+                        <input type="password" id="profil-password" class="form-control border-end-0"
+                            placeholder="Biarkan kosong jika tidak diubah" autocomplete="new-password">
+                        <button type="button" id="toggle-pw" class="input-group-text bg-transparent"
+                            title="Tampilkan password">
+                            <i class="bi bi-eye text-muted" id="eye-icon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <button type="button" id="btn-logout" class="btn btn-outline-danger btn-sm px-3 fw-bold">
+                        <i class="bi bi-box-arrow-left me-1"></i>Keluar
+                    </button>
+
+                    <button type="submit" id="btn-save" class="btn-bmn-primary" style="width:auto;min-width:140px">
+                        <span class="btn-text"><i class="bi bi-save me-1"></i>Simpan</span>
+                        <span class="spinner d-none" id="spin-save"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- ─── Bottom Nav ──────────────────────────────────────────── -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html">
+            <i class="bi bi-upc-scan"></i>Input
+        </a>
+        <a href="rekap.html">
+            <i class="bi bi-bar-chart-line"></i>Rekap
+        </a>
+        <a href="users.html" data-admin-only id="nav-users" class="d-none">
+            <i class="bi bi-people"></i>Pengguna
+        </a>
+        <a href="profil.html" class="active">
+            <i class="bi bi-person"></i>Profil
+        </a>
+    </nav>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core App Logic -->
+    <script type="module" src="./js/profil.js"></script>
+
+</body>
+
+</html>
