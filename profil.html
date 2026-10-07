@@ -88,6 +88,30 @@
 
     </main>
 
+    <!-- ─── Logout Confirmation Modal ────────────────────────────── -->
+    <div class="modal modal-bmn fade" id="modal-logout" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered mx-3" style="max-width: 400px; margin: auto;">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-box-arrow-right text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Konfirmasi Keluar</h5>
+                    <p class="text-muted fs-sm mb-4">Apakah Anda yakin ingin keluar dari aplikasi?</p>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <button type="button" class="btn btn-dark text-white fw-bold px-4 py-2" data-bs-dismiss="modal">
+                            Batal
+                        </button>
+                        <button type="button" class="btn btn-primary fw-bold px-4 py-2" id="btn-confirm-logout"
+                            style="background-color: var(--primary); border-color: var(--primary);">
+                            Oke
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ─── Bottom Nav ──────────────────────────────────────────── -->
     <nav class="bottom-nav">
         <a href="dashboard.html">

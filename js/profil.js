@@ -139,8 +139,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     // (Logout from header removed)
 
     // Logout from main content button
+    const modalLogout = new bootstrap.Modal(document.getElementById("modal-logout"));
+
     document.getElementById("btn-logout").addEventListener("click", () => {
-        if (confirm("Keluar dari aplikasi?")) logoutUser();
+        modalLogout.show();
+    });
+
+    document.getElementById("btn-confirm-logout").addEventListener("click", () => {
+        logoutUser();
     });
 });
 
