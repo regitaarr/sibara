@@ -1,7 +1,7 @@
 import { requireAuth, logoutUser, applyRoleUI } from "./auth.js";
 import { db } from "./firebase-config.js";
-import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getAuth, updateProfile, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, getDoc, updateDoc, writeBatch, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, updateProfile, updatePassword, updateEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 // ─── Toast helper ─────────────────────────────────────────────
 function showToast(msg, type = "success") {
@@ -44,11 +44,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         const alertEl = document.getElementById("profil-alert");
         alertEl.classList.add("d-none");
 
+        const newEmail = document.getElementById("profil-email").value.trim().toLowerCase();
         const newNama = document.getElementById("profil-nama").value.trim();
         const newPassword = document.getElementById("profil-password").value;
 
-        if (!newNama) {
-            showAlert("Nama tidak boleh kosong.", "warning");
+        if (!newNama || !newEmail) {
+            showAlert("Email dan Nama tidak boleh kosong.", "warning");
             return;
         }
 
@@ -64,12 +65,52 @@ document.addEventListener("DOMContentLoaded", async () => {
         btn.querySelector(".btn-text").classList.add("d-none");
 
         try {
-            // Update Firestore Profile Name
-            const userRef = doc(db, "users", currentUser.email);
-            await updateDoc(userRef, { nama: newNama });
+            const isEmailChanged = newEmail !== currentUser.email;
 
-            // Update Auth Display Name
-            await updateProfile(currentUser, { displayName: newNama });
+            // 1. Update Firebase Auth Email
+            if (isEmailChanged) {
+                try {
+                    await updateEmail(currentUser, newEmail);
+                } catch (emailErr) {
+                    if (emailErr.code === "auth/requires-recent-login") {
+                        throw new Error("Pembaruan email ditolak keamanan: Sesi sudah lama. Silakan Logout dan Login kembali terlebih dahulu.");
+                    } else if (emailErr.code === "auth/email-already-in-use") {
+                        throw new Error("Email tersebut sudah digunakan oleh akun lain.");
+                    } else if (emailErr.code === "auth/invalid-email") {
+                        throw new Error("Format email tidak valid.");
+                    } else {
+                        throw emailErr;
+                    }
+                }
+            }
+
+            // 2. Update Auth Display Name
+            if (newNama !== currentUser.displayName) {
+                await updateProfile(currentUser, { displayName: newNama });
+            }
+
+            // 3. Update Firestore Data
+            if (isEmailChanged) {
+                const oldUserRef = doc(db, "users", currentUser.email);
+                const newUserRef = doc(db, "users", newEmail);
+
+                const oldSnap = await getDoc(oldUserRef);
+                const batch = writeBatch(db);
+
+                if (oldSnap.exists()) {
+                    batch.set(newUserRef, { ...oldSnap.data(), nama: newNama });
+                    batch.delete(oldUserRef);
+                } else {
+                    batch.set(newUserRef, { nama: newNama, role: currentRole || "user", status: true });
+                }
+                await batch.commit();
+
+                // Update local session reference just in case
+                currentUser.email = newEmail;
+            } else {
+                const userRef = doc(db, "users", currentUser.email);
+                await updateDoc(userRef, { nama: newNama });
+            }
 
             // Update Password if provided
             if (newPassword) {
