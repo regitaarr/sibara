@@ -42,9 +42,10 @@
         <div class="card-bmn">
             <div class="card-title"><i class="bi bi-upc-scan"></i> Input Barcode Barang</div>
 
-            <div class="d-flex gap-2 mb-3 position-relative">
+            <div class="d-flex gap-2 mb-3 position-relative align-items-stretch">
                 <div class="flex-grow-1 position-relative">
-                    <input type="text" id="manual-barcode" class="form-control form-control-lg fw-bold text-center"
+                    <input type="text" id="manual-barcode"
+                        class="form-control form-control-lg fw-bold text-center h-100"
                         placeholder="Ketik kode atau cari nama barang..." autocomplete="off" autofocus>
 
                     <!-- Custom Autocomplete Dropdown -->
@@ -55,7 +56,9 @@
                     </div>
                 </div>
 
-                <button id="btn-manual" class="btn-bmn-primary px-4 text-nowrap">
+                <button id="btn-manual"
+                    class="btn-bmn-primary px-4 text-nowrap d-flex align-items-center justify-content-center border-0"
+                    style="min-height: 48px;">
                     <i class="bi bi-search me-1"></i>Cek
                 </button>
             </div>
