@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Sistem BMN</title>
+    <meta name="description" content="Scan barcode dan input transaksi barang masuk/keluar BMN">
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- html5-qrcode -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <!-- browser-image-compression -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.min.js"></script>
+</head>
+
+<body>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- ─── Topbar ─────────────────────────────────────────────── -->
+    <header class="topbar">
+        <div class="brand">
+            <img src="assets/bps.png" alt="BPS" style="height: 24px; margin-right: 8px;">
+            Sistem BMN
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <div class="user-info text-end d-none d-sm-block" id="user-display"></div>
+            <button class="btn-icon" id="btn-logout" title="Keluar">
+                <i class="bi bi-box-arrow-right"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ─── Page Content ────────────────────────────────────────── -->
+    <main class="page-content">
+
+        <!-- Scanner Card -->
+        <div class="card-bmn">
+            <div class="card-title"><i class="bi bi-qr-code-scan"></i> Pindai Barcode</div>
+
+            <div id="scanner-container" class="mb-3">
+                <div id="reader"></div>
+            </div>
+
+            <!-- Camera error fallback -->
+            <div id="camera-error" class="alert alert-warning py-2 d-none mb-3">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                Kamera tidak tersedia. Gunakan input manual.
+            </div>
+
+            <!-- Manual input -->
+            <div class="d-flex gap-2">
+                <input type="text" id="manual-barcode" class="form-control" placeholder="Ketik kode barcode manual..."
+                    inputmode="numeric">
+                <button id="btn-manual" class="btn-bmn-secondary px-3 text-nowrap">
+                    <i class="bi bi-search me-1"></i>Cek
+                </button>
+            </div>
+        </div>
+
+        <!-- Info Barang -->
+        <div id="barang-panel" class="hidden">
+
+            <!-- Existing item -->
+            <div id="panel-existing" class="card-bmn barang-info hidden">
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                    <div>
+                        <div class="fs-sm text-muted">Kode Barcode</div>
+                        <div class="fw-600" id="info-barcode">—</div>
+                    </div>
+                    <button id="btn-reset-scan" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-counterclockwise"></i> Scan Ulang
+                    </button>
+                </div>
+                <div class="mt-2">
+                    <div class="fs-sm text-muted">Nama Barang</div>
+                    <div class="fw-600 fs-5" id="info-nama">—</div>
+                </div>
+                <div class="mt-2">
+                    <div class="fs-sm text-muted mb-1">Stok Terkini</div>
+                    <span class="stok-badge" id="info-stok">— </span>
+                    <span class="ms-1 text-muted fs-sm" id="info-satuan"></span>
+                </div>
+            </div>
+
+            <!-- New item form -->
+            <div id="panel-new" class="card-bmn hidden">
+                <div class="card-title"><i class="bi bi-plus-circle text-success"></i> Barang Baru</div>
+                <div class="alert alert-info py-2 mb-3 fs-sm">
+                    Barcode <strong id="new-barcode-display"></strong> belum terdaftar. Lengkapi data berikut.
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="new-nama">Nama Barang</label>
+                    <input type="text" id="new-nama" class="form-control" placeholder="Contoh: Kertas A4 HVS">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="new-satuan">Satuan</label>
+                    <select id="new-satuan" class="form-select">
+                        <option value="" disabled selected>Pilih satuan...</option>
+                        <option value="buah">buah</option>
+                        <option value="rim">rim</option>
+                        <option value="kotak">kotak</option>
+                        <option value="lusin">lusin</option>
+                        <option value="pak">pak</option>
+                        <option value="unit">unit</option>
+                        <option value="set">set</option>
+                        <option value="lembar">lembar</option>
+                        <option value="botol">botol</option>
+                        <option value="kg">kg</option>
+                        <option value="liter">liter</option>
+                    </select>
+                </div>
+                <button id="btn-daftar" class="btn-bmn-primary">
+                    <i class="bi bi-check2-circle"></i> Daftarkan & Lanjut
+                </button>
+            </div>
+        </div>
+
+        <!-- Transaction Form -->
+        <div id="transaksi-panel" class="card-bmn hidden">
+            <div class="card-title"><i class="bi bi-pencil-square"></i> Input Transaksi</div>
+
+            <!-- Validation error -->
+            <div id="txn-error" class="alert alert-danger py-2 mb-3 d-none fs-sm"></div>
+
+            <form id="form-transaksi" novalidate>
+
+                <!-- Jenis toggle -->
+                <div class="mb-3">
+                    <label class="form-label">Jenis Transaksi</label>
+                    <div class="jenis-toggle">
+                        <input type="radio" id="r-masuk" name="jenis" value="masuk" checked>
+                        <label for="r-masuk"><i class="bi bi-arrow-down-circle me-1"></i>Masuk</label>
+
+                        <input type="radio" id="r-keluar" name="jenis" value="keluar">
+                        <label for="r-keluar"><i class="bi bi-arrow-up-circle me-1"></i>Keluar</label>
+                    </div>
+                </div>
+
+                <!-- Jumlah -->
+                <div class="mb-3">
+                    <label class="form-label" for="input-jumlah">Jumlah</label>
+                    <input type="number" id="input-jumlah" class="form-control" min="1" placeholder="0"
+                        inputmode="numeric" required>
+                    <div class="form-text" id="hint-stok"></div>
+                </div>
+
+                <!-- Tanggal -->
+                <div class="mb-3">
+                    <label class="form-label" for="input-tanggal">Tanggal Transaksi</label>
+                    <input type="date" id="input-tanggal" class="form-control" required>
+                </div>
+
+                <!-- Foto -->
+                <div class="mb-4">
+                    <label class="form-label" for="input-foto">Foto Fisik Barang</label>
+                    <input type="file" id="input-foto" class="form-control" accept="image/*" capture="environment">
+                    <img id="foto-preview" class="photo-preview" alt="Preview foto barang">
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" id="btn-submit" class="btn-bmn-primary">
+                    <span class="btn-text"><i class="bi bi-cloud-upload"></i> Simpan Transaksi</span>
+                    <span class="spinner d-none" id="spin-submit"></span>
+                </button>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- ─── Bottom Nav ──────────────────────────────────────────── -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="active">
+            <i class="bi bi-qr-code-scan"></i>Scanner
+        </a>
+        <a href="rekap.html">
+            <i class="bi bi-bar-chart-line"></i>Rekap
+        </a>
+        <a href="users.html" data-admin-only id="nav-users">
+            <i class="bi bi-people"></i>Pengguna
+        </a>
+    </nav>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script type="module">
+        import { requireAuth, logoutUser, applyRoleUI } from "./js/auth.js";
+        import { initScanner, stopScanner, restartScanner, getBarangByBarcode, unlockScanner } from "./js/scanner.js";
+        import { getBase64Photo, saveTransaksi, saveMasterBarang } from "./js/transaction.js";
+
+        // ─── Toast helper ─────────────────────────────────────────────
+        function showToast(msg, type = "success") {
+            const el = document.createElement("div");
+            el.className = `toast-bmn ${type}`;
+            el.innerHTML = `<i class="bi bi-${type === "success" ? "check-circle" : type === "error" ? "x-circle" : "exclamation-triangle"} me-2"></i>${msg}`;
+            document.getElementById("toast-container").appendChild(el);
+            setTimeout(() => el.remove(), 4000);
+        }
+
+        // ─── State ────────────────────────────────────────────────────
+        let currentBarcode = null;
+        let currentNama = null;
+        let currentSatuan = null;
+        let currentStok = 0;
+        let currentUser = null;
+        let currentRole = null;
+
+        // ─── Auth guard ───────────────────────────────────────────────
+        try {
+            const { user, role } = await requireAuth();
+            currentUser = user;
+            currentRole = role;
+            document.getElementById("user-display").textContent = user.email;
+            applyRoleUI(role);
+        } catch (_) { /* redirected */ }
+
+        // ─── Logout ───────────────────────────────────────────────────
+        document.getElementById("btn-logout").addEventListener("click", () => {
+            if (confirm("Keluar dari aplikasi?")) logoutUser();
+        });
+
+        // ─── Scanner callbacks ─────────────────────────────────────────
+        async function onBarcodeDetected(barcode) {
+            await stopScanner();
+            await handleBarcode(barcode.trim());
+        }
+
+        // ─── Init scanner ─────────────────────────────────────────────
+        try {
+            await initScanner("reader", onBarcodeDetected);
+        } catch (err) {
+            document.getElementById("camera-error").classList.remove("d-none");
+        }
+
+        // ─── Manual barcode check ─────────────────────────────────────
+        document.getElementById("btn-manual").addEventListener("click", async () => {
+            const val = document.getElementById("manual-barcode").value.trim();
+            if (!val) { showToast("Masukkan kode barcode terlebih dahulu.", "warning"); return; }
+            await stopScanner();
+            await handleBarcode(val);
+        });
+        document.getElementById("manual-barcode").addEventListener("keydown", async (e) => {
+            if (e.key === "Enter") document.getElementById("btn-manual").click();
+        });
+
+        // ─── Handle barcode result ─────────────────────────────────────
+        async function handleBarcode(barcode) {
+            currentBarcode = barcode;
+            document.getElementById("barang-panel").classList.remove("hidden");
+
+            const barang = await getBarangByBarcode(barcode);
+
+            if (barang) {
+                // Existing item
+                currentNama = barang.nama_barang;
+                currentSatuan = barang.satuan;
+                currentStok = barang.stok_terkini ?? 0;
+
+                document.getElementById("info-barcode").textContent = barcode;
+                document.getElementById("info-nama").textContent = currentNama;
+                document.getElementById("info-satuan").textContent = currentSatuan;
+                const stokEl = document.getElementById("info-stok");
+                stokEl.textContent = currentStok;
+                stokEl.className = "stok-badge" + (currentStok === 0 ? " zero" : currentStok < 5 ? " low" : "");
+
+                showPanel("existing");
+                showTransaksiForm();
+            } else {
+                // New item
+                document.getElementById("new-barcode-display").textContent = barcode;
+                showPanel("new");
+            }
+        }
+
+        function showPanel(type) {
+            document.getElementById("panel-existing").classList.toggle("hidden", type !== "existing");
+            document.getElementById("panel-new").classList.toggle("hidden", type !== "new");
+        }
+
+        function showTransaksiForm() {
+            const panel = document.getElementById("transaksi-panel");
+            panel.classList.remove("hidden");
+            // Set today's date
+            const today = new Date().toISOString().split("T")[0];
+            document.getElementById("input-tanggal").value = today;
+            document.getElementById("input-jumlah").value = "";
+            document.getElementById("txn-error").classList.add("d-none");
+            updateStokHint();
+        }
+
+        // ─── Register new barang ─────────────────────────────────────
+        document.getElementById("btn-daftar").addEventListener("click", async () => {
+            const nama = document.getElementById("new-nama").value.trim();
+            const satuan = document.getElementById("new-satuan").value;
+            if (!nama || !satuan) { showToast("Lengkapi nama dan satuan barang.", "warning"); return; }
+
+            try {
+                await saveMasterBarang(currentBarcode, nama, satuan);
+                currentNama = nama;
+                currentSatuan = satuan;
+                currentStok = 0;
+
+                document.getElementById("info-barcode").textContent = currentBarcode;
+                document.getElementById("info-nama").textContent = currentNama;
+                document.getElementById("info-satuan").textContent = currentSatuan;
+                document.getElementById("info-stok").textContent = "0";
+                document.getElementById("info-stok").className = "stok-badge zero";
+
+                showPanel("existing");
+                showTransaksiForm();
+                showToast("Barang berhasil didaftarkan!");
+            } catch (err) {
+                showToast("Gagal mendaftarkan barang: " + err.message, "error");
+            }
+        });
+
+        // ─── Scan reset ───────────────────────────────────────────────
+        document.getElementById("btn-reset-scan").addEventListener("click", async () => {
+            resetUI();
+            try {
+                await restartScanner("reader", onBarcodeDetected);
+            } catch (err) {
+                document.getElementById("camera-error").classList.remove("d-none");
+            }
+        });
+
+        function resetUI() {
+            currentBarcode = currentNama = currentSatuan = null;
+            currentStok = 0;
+            document.getElementById("barang-panel").classList.add("hidden");
+            document.getElementById("transaksi-panel").classList.add("hidden");
+            document.getElementById("manual-barcode").value = "";
+            document.getElementById("form-transaksi").reset();
+            document.getElementById("foto-preview").style.display = "none";
+            document.getElementById("txn-error").classList.add("d-none");
+            unlockScanner();
+        }
+
+        // ─── Stok hint dynamically ────────────────────────────────────
+        function updateStokHint() {
+            const jenis = document.querySelector('input[name="jenis"]:checked')?.value;
+            const hint = document.getElementById("hint-stok");
+            hint.textContent = jenis === "keluar"
+                ? `Stok tersedia: ${currentStok} ${currentSatuan || ""}`
+                : "";
+        }
+        document.querySelectorAll('input[name="jenis"]').forEach(r =>
+            r.addEventListener("change", updateStokHint)
+        );
+
+        // ─── Photo preview ────────────────────────────────────────────
+        document.getElementById("input-foto").addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            const preview = document.getElementById("foto-preview");
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = "block";
+            }
+        });
+
+        // ─── Submit transaction ───────────────────────────────────────
+        document.getElementById("form-transaksi").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const jenis = document.querySelector('input[name="jenis"]:checked').value;
+            const jumlah = parseInt(document.getElementById("input-jumlah").value, 10);
+            const tanggal = document.getElementById("input-tanggal").value;
+            const fotoFile = document.getElementById("input-foto").files[0];
+            const errorEl = document.getElementById("txn-error");
+
+            errorEl.classList.add("d-none");
+
+            // Validasi stok keluar
+            if (jenis === "keluar" && jumlah > currentStok) {
+                errorEl.textContent = `Stok tidak mencukupi! Stok terkini: ${currentStok} ${currentSatuan}. Jumlah keluar: ${jumlah}.`;
+                errorEl.classList.remove("d-none");
+                return;
+            }
+            if (!jumlah || jumlah < 1) {
+                errorEl.textContent = "Jumlah harus diisi minimal 1.";
+                errorEl.classList.remove("d-none");
+                return;
+            }
+
+            const btn = document.getElementById("btn-submit");
+            const spin = document.getElementById("spin-submit");
+            btn.disabled = true;
+            spin.classList.remove("d-none");
+            btn.querySelector(".btn-text").classList.add("d-none");
+
+            try {
+                // Konversi foto menjadi Base64 string
+                let fotoUrl = "";
+                if (fotoFile) {
+                    fotoUrl = await getBase64Photo(fotoFile);
+                }
+
+                // Save transaction atomically
+                await saveTransaksi({
+                    kode_barcode: currentBarcode,
+                    nama_barang: currentNama,
+                    satuan: currentSatuan,
+                    jenis,
+                    jumlah,
+                    tanggal,
+                    foto_url: fotoUrl,
+                    input_by: currentUser.email
+                });
+
+                showToast(`Transaksi ${jenis} berhasil disimpan! Stok diperbarui.`);
+                resetUI();
+                // Restart camera
+                try {
+                    await restartScanner("reader", onBarcodeDetected);
+                } catch (_) { }
+            } catch (err) {
+                errorEl.textContent = err.message || "Gagal menyimpan transaksi. Coba lagi.";
+                errorEl.classList.remove("d-none");
+            } finally {
+                btn.disabled = false;
+                spin.classList.add("d-none");
+                btn.querySelector(".btn-text").classList.remove("d-none");
+            }
+        });
+    </script>
+
+</body>
+
+</html>
