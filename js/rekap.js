@@ -5,7 +5,8 @@
 import { db } from "./firebase-config.js";
 import {
     collection, onSnapshot, query, orderBy, where, Timestamp,
-    doc, deleteDoc, updateDoc, runTransaction, serverTimestamp
+    doc, deleteDoc, updateDoc, runTransaction, serverTimestamp,
+    getDoc, writeBatch, getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let unsubscribeStok = null;
@@ -130,4 +131,44 @@ export async function updateTransaksi(id, newData) {
             // Kita batasi hanya bisa edit jumlah & tanggal untuk menjaga konsistensi database
         });
     });
+}
+
+// ─── Rename barcode (admin only) ──────────────────────────────
+export async function renameBarang(oldBarcode, newBarcode, newData) {
+    if (oldBarcode === newBarcode) return;
+
+    const newRef = doc(db, "barang", newBarcode);
+    const newSnap = await getDoc(newRef);
+    if (newSnap.exists()) {
+        throw new Error(`Barcode ${newBarcode} sudah terdaftar untuk barang lain!`);
+    }
+
+    const oldRef = doc(db, "barang", oldBarcode);
+    const oldSnap = await getDoc(oldRef);
+    if (!oldSnap.exists()) {
+        throw new Error("Barang asal tidak ditemukan!");
+    }
+
+    const batch = writeBatch(db);
+
+    // Copy data to new doc
+    batch.set(newRef, {
+        ...oldSnap.data(),
+        nama_barang: newData.nama_barang,
+        satuan: newData.satuan,
+        last_updated: serverTimestamp()
+    });
+
+    // Delete old doc
+    batch.delete(oldRef);
+
+    // Update all historical transactions pointing to the old barcode
+    const q = query(collection(db, "transaksi"), where("kode_barcode", "==", oldBarcode));
+    const txSnap = await getDocs(q);
+
+    txSnap.forEach(tDoc => {
+        batch.update(tDoc.ref, { kode_barcode: newBarcode });
+    });
+
+    await batch.commit();
 }

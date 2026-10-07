@@ -187,7 +187,7 @@
                         <input type="hidden" id="edit-barang-id">
                         <div class="mb-3">
                             <label class="form-label text-muted fs-sm">Kode Barcode</label>
-                            <div id="edit-barang-barcode" class="fw-bold"></div>
+                            <input type="text" id="edit-barang-barcode" class="form-control fw-bold" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Nama Barang</label>
@@ -265,7 +265,7 @@
         import { requireAuth, logoutUser, applyRoleUI } from "./js/auth.js";
         import {
             listenStok, listenTransaksi, formatTanggal,
-            deleteTransaksi, deleteBarang, updateBarang, updateTransaksi
+            deleteTransaksi, deleteBarang, updateBarang, updateTransaksi, renameBarang
         } from "./js/rekap.js";
         import { exportToExcel } from "./js/excel-export.js";
 
@@ -446,28 +446,34 @@
         const editBarangModal = new bootstrap.Modal(document.getElementById("modal-edit-barang"));
         window.openEditBarang = function (id, nama, satuan) {
             document.getElementById("edit-barang-id").value = id;
-            document.getElementById("edit-barang-barcode").textContent = id;
+            document.getElementById("edit-barang-barcode").value = id;
             document.getElementById("edit-barang-nama").value = nama;
             document.getElementById("edit-barang-satuan").value = satuan;
             editBarangModal.show();
         };
 
         document.getElementById("btn-save-barang").addEventListener("click", async () => {
-            const id = document.getElementById("edit-barang-id").value;
+            const oldId = document.getElementById("edit-barang-id").value;
+            const newId = document.getElementById("edit-barang-barcode").value.trim();
             const data = {
                 nama_barang: document.getElementById("edit-barang-nama").value.trim(),
                 satuan: document.getElementById("edit-barang-satuan").value
             };
-            if (!data.nama_barang) return showToast("Nama barang wajib diisi.", "warning");
+            if (!data.nama_barang || !newId) return showToast("Nama barang dan barcode wajib diisi.", "warning");
 
             const btn = document.getElementById("btn-save-barang");
             btn.disabled = true;
             try {
-                await updateBarang(id, data);
-                showToast("Data barang berhasil diperbarui!");
+                if (oldId !== newId) {
+                    await renameBarang(oldId, newId, data);
+                    showToast(`Barcode / ID berhasil diubah dari ${oldId} menjadi ${newId}!`);
+                } else {
+                    await updateBarang(oldId, data);
+                    showToast("Data barang berhasil diperbarui!");
+                }
                 editBarangModal.hide();
             } catch (err) {
-                showToast("Gagal mengupdate barang: " + err.message, "error");
+                showToast(err.message || "Gagal mengupdate barang", "error");
             } finally {
                 btn.disabled = false;
             }
