@@ -136,10 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    // Logout from header
-    document.getElementById("btn-logout-header").addEventListener("click", () => {
-        if (confirm("Keluar dari aplikasi?")) logoutUser();
-    });
+    // (Logout from header removed)
 
     // Logout from main content button
     document.getElementById("btn-logout").addEventListener("click", () => {
