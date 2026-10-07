@@ -24,7 +24,7 @@ export async function loginUser(email, password) {
 // ─── Logout ──────────────────────────────────────────────────
 export async function logoutUser() {
     await signOut(auth);
-    window.location.href = "/index.html";
+    window.location.href = "index.html";
 }
 
 // ─── Password Reset ──────────────────────────────────────────
@@ -51,21 +51,21 @@ export function requireAuth(requiredRole = null) {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             unsubscribe();
             if (!user) {
-                window.location.href = "/index.html";
+                window.location.href = "index.html";
                 reject(new Error("Not authenticated"));
                 return;
             }
             try {
                 const role = await getUserRole(user.email);
                 if (requiredRole === "admin" && role !== "admin") {
-                    window.location.href = "/dashboard.html";
+                    window.location.href = "dashboard.html";
                     reject(new Error("Not authorized"));
                     return;
                 }
                 resolve({ user, role });
             } catch (err) {
                 await signOut(auth);
-                window.location.href = "/index.html";
+                window.location.href = "index.html";
                 reject(err);
             }
         });
