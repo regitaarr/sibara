@@ -298,10 +298,7 @@
                 document.getElementById("nav-users").classList.remove("d-none");
             }
         } catch (_) { }
-
-        document.getElementById("btn-logout").addEventListener("click", () => {
-            if (confirm("Keluar dari aplikasi?")) logoutUser();
-        });
+        // (Logout moved to Profil page)
 
         // ─── Month filter default ──────────────────────────────────────
         const today = new Date();

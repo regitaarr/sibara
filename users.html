@@ -148,10 +148,7 @@
                 await requireAuth("admin");
             } catch (_) { }
 
-            document.getElementById("btn-logout").addEventListener("click", () => {
-                if (confirm("Keluar dari aplikasi?")) logoutUser();
-            });
-
+            // (Logout moved to Profil page)
             // ─── Load & render users ──────────────────────────────────
             async function renderUsers() {
                 const container = document.getElementById("users-list");

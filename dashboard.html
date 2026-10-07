@@ -242,10 +242,7 @@
             }
         });
 
-        // ─── Logout ───────────────────────────────────────────────────
-        document.getElementById("btn-logout").addEventListener("click", () => {
-            if (confirm("Keluar dari aplikasi?")) logoutUser();
-        });
+        // (Logout moved to Profil page)
 
         // ─── Scanner callbacks ─────────────────────────────────────────
         async function onBarcodeDetected(barcode) {
