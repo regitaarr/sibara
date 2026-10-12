@@ -32,7 +32,6 @@
             Sistem BMN
         </div>
         <div class="d-flex align-items-center gap-2">
-            <span class="badge" id="role-badge" style="font-size: 0.8rem; padding: 5px 10px;"></span>
             <div class="user-info text-end d-none d-sm-block" id="user-display"></div>
         </div>
     </header>
@@ -245,11 +244,6 @@
             currentUser = user;
             currentRole = role;
             document.getElementById("user-display").textContent = user.email;
-            const roleBadge = document.getElementById("role-badge");
-            if (roleBadge) {
-                roleBadge.className = `badge ${role === "admin" ? "bg-primary" : "bg-secondary"}`;
-                roleBadge.textContent = role === "admin" ? "👑 Admin" : "👤 User";
-            }
             applyRoleUI(role);
         } catch (_) { /* redirected */ }
 
