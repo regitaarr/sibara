@@ -69,6 +69,22 @@
                 <h6><i class="bi bi-boxes me-1"></i>Stok Terkini</h6>
                 <span class="badge bg-primary rounded-pill" id="badge-stok-count">0</span>
             </div>
+
+            <!-- Search Stok Terkini -->
+            <div class="mb-3">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white text-muted border-end-0">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" id="search-stok" class="form-control border-start-0 ps-0"
+                        placeholder="Cari barcode atau nama barang..." autocomplete="off">
+                    <button class="btn btn-outline-secondary border-start-0 d-none" type="button" id="btn-clear-stok"
+                        title="Reset pencarian">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+
             <div class="table-wrap">
                 <table class="table-bmn">
                     <thead>
@@ -359,11 +375,47 @@
 
         // ─── Real-time stok ────────────────────────────────────────────
         let allStok = [];
+        let filteredStok = [];
+        let stokSearchQuery = "";
+
+        const searchStokInput = document.getElementById("search-stok");
+        const btnClearStok = document.getElementById("btn-clear-stok");
+
+        function applyStokFilter() {
+            const q = stokSearchQuery.toLowerCase().trim();
+            if (!q) {
+                filteredStok = allStok;
+            } else {
+                filteredStok = allStok.filter(item => {
+                    const barcode = String(item.id || item.kode_barcode || "").toLowerCase();
+                    const nama = String(item.nama_barang || "").toLowerCase();
+                    return barcode.includes(q) || nama.includes(q);
+                });
+            }
+            document.getElementById("badge-stok-count").textContent = filteredStok.length;
+            renderStok(filteredStok);
+        }
+
         listenStok((items) => {
             allStok = items;
             document.getElementById("stat-total-item").textContent = items.length;
-            document.getElementById("badge-stok-count").textContent = items.length;
-            renderStok(items);
+            applyStokFilter();
+        });
+
+        searchStokInput.addEventListener("input", (e) => {
+            stokSearchQuery = e.target.value;
+            stokCurrentPage = 1;
+            btnClearStok.classList.toggle("d-none", !stokSearchQuery);
+            applyStokFilter();
+        });
+
+        btnClearStok.addEventListener("click", () => {
+            searchStokInput.value = "";
+            stokSearchQuery = "";
+            btnClearStok.classList.add("d-none");
+            stokCurrentPage = 1;
+            applyStokFilter();
+            searchStokInput.focus();
         });
 
         function renderStok(items) {
@@ -371,8 +423,11 @@
             const isAdmin = currentRole === "admin";
 
             if (!items.length) {
+                const emptyMsg = stokSearchQuery.trim()
+                    ? `Tidak ada barang yang cocok dengan pencarian "<strong>${stokSearchQuery.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</strong>".`
+                    : "Belum ada data barang.";
                 tbody.innerHTML = `<tr><td colspan="5">
-        <div class="empty-state"><i class="bi bi-inbox"></i><p>Belum ada data barang.</p></div>
+        <div class="empty-state"><i class="bi ${stokSearchQuery.trim() ? "bi-search" : "bi-inbox"}"></i><p>${emptyMsg}</p></div>
       </td></tr>`;
                 document.getElementById("pagination-stok").innerHTML = "";
                 return;
@@ -383,10 +438,14 @@
 
             tbody.innerHTML = paginatedItems.map((item, idx) => {
                 const i = startIndex + idx;
+                const barcode = item.id || item.kode_barcode || "—";
                 return `
       <tr>
         <td>${i + 1}</td>
-        <td class="fw-600">${item.nama_barang || "—"}</td>
+        <td>
+          <div class="fw-600">${item.nama_barang || "—"}</div>
+          <div class="text-muted small font-monospace"><i class="bi bi-upc me-1"></i>${barcode}</div>
+        </td>
         <td>${item.satuan || "—"}</td>
         <td>
           <span class="pill ${item.stok_terkini === 0 ? "badge-keluar" : item.stok_terkini < 5 ? "" : "badge-masuk"}"
@@ -397,7 +456,7 @@
         <td>
           <div class="d-flex gap-1 justify-content-center">
             <button class="btn btn-sm btn-outline-primary py-0 px-2"
-                    onclick="openEditBarang('${item.id}', '${(item.nama_barang || "").replace(/'/g, "\\'")}', '${item.satuan}')"
+                    onclick="openEditBarang('${item.id}', '${(item.nama_barang || "").replace(/'/g, "\\'")}', '${(item.satuan || "").replace(/'/g, "\\'")}')"
                     title="Edit barang">
               <i class="bi bi-pencil"></i>
             </button>
@@ -414,7 +473,7 @@
 
             renderPagination(items.length, stokItemsPerPage, stokCurrentPage, "pagination-stok", (newPage) => {
                 stokCurrentPage = newPage;
-                renderStok(allStok);
+                renderStok(filteredStok);
             });
         }
 
