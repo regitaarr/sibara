@@ -20,13 +20,14 @@ service cloud.firestore {
 
     // ─── users collection ───────────────────────────────────
     // - Admin: full read/write/delete
-    // - User: read own document only, no write
+    // - User: read/create/update own document
     match /users/{userId} {
       allow read: if isAuthenticated() &&
         (request.auth.token.email.lower() == userId || isAdmin());
       allow create: if isAuthenticated() &&
         (request.auth.token.email.lower() == userId || isAdmin());
-      allow update: if isAuthenticated() && isAdmin();
+      allow update: if isAuthenticated() &&
+        (request.auth.token.email.lower() == userId || isAdmin());
       allow delete: if isAuthenticated() && isAdmin();
     }
 

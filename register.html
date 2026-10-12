@@ -88,6 +88,24 @@
                     </div>
                 </div>
 
+                <!-- Pilihan Role -->
+                <div class="mb-3">
+                    <label class="form-label" for="role">Pilihan Role</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="bi bi-person-badge text-muted"></i>
+                        </span>
+                        <select id="role" class="form-select border-start-0" required>
+                            <option value="" disabled selected>Pilih Role Akun...</option>
+                            <option value="user">User (Staf Operasional)</option>
+                            <option value="admin">Admin (Administrator)</option>
+                        </select>
+                    </div>
+                    <div class="form-text fs-sm text-muted">
+                        <i class="bi bi-info-circle me-1"></i>Akun memerlukan persetujuan Admin sebelum dapat digunakan.
+                    </div>
+                </div>
+
                 <button type="submit" id="btn-register" class="btn-bmn-primary mt-2">
                     <span class="btn-text"><i class="bi bi-person-plus"></i> Daftar Sekarang</span>
                     <span class="spinner d-none" id="spin-register"></span>

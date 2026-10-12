@@ -50,6 +50,8 @@ document.addEventListener("DOMContentLoaded", () => {
         eyeConfirmIcon.className = isPassword ? "bi bi-eye-slash text-muted" : "bi bi-eye text-muted";
     });
 
+    const roleSelect = document.getElementById("role");
+
     // ─── Form Submission ──────────────────────────────────────────
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -59,6 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const email = emailInput.value.trim();
         const password = passwordInput.value;
         const confirmPassword = confirmPasswordInput.value;
+        const role = roleSelect ? roleSelect.value : "user";
 
         // Validation
         if (!nama) {
@@ -86,15 +89,21 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        if (!role) {
+            showAlert("Silakan pilih role akun terlebih dahulu.");
+            roleSelect.focus();
+            return;
+        }
+
         setLoading(true);
 
         try {
-            await registerUser(nama, email, password);
-            showAlert("Pendaftaran berhasil! Mengalihkan ke aplikasi...", "success");
+            await registerUser(nama, email, password, role);
+            showAlert("Registrasi berhasil! Akun Anda sedang menunggu persetujuan dari Admin sebelum dapat digunakan untuk login. Mengalihkan ke halaman login...", "success");
 
             setTimeout(() => {
-                window.location.href = "dashboard.html";
-            }, 1200);
+                window.location.href = "index.html";
+            }, 3000);
         } catch (err) {
             console.error("Register Error:", err);
             let msg = "Terjadi kesalahan saat pendaftaran. Silakan coba lagi.";

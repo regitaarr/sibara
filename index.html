@@ -116,7 +116,7 @@
     <script type="module">
         import { loginUser, sendResetEmail, getUserRole } from "./js/auth.js";
         import { auth } from "./js/firebase-config.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         // Redirect already-logged-in users
         onAuthStateChanged(auth, async (user) => {
@@ -124,7 +124,9 @@
                 try {
                     const role = await getUserRole(user.email);
                     window.location.href = "dashboard.html";
-                } catch (_) { }
+                } catch (_) {
+                    signOut(auth).catch(() => { });
+                }
             }
         });
 
@@ -159,6 +161,7 @@
                 await getUserRole(user.email);
                 window.location.href = "dashboard.html";
             } catch (err) {
+                signOut(auth).catch(() => { });
                 let msg = "Login gagal. Periksa email dan password.";
                 if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password"
                     || err.code === "auth/invalid-credential") {

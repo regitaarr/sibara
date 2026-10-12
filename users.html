@@ -165,14 +165,27 @@
           <div class="flex-grow-1 overflow-hidden">
             <div class="fw-600 text-truncate">${u.nama || "—"}</div>
             <div class="fs-sm text-muted text-truncate">${u.id}</div>
-            <div class="mt-1 d-flex gap-1 flex-wrap">
-              <span class="pill badge-${u.role || "user"}">${u.role === "admin" ? "👑 Admin" : "👤 User"}</span>
-              <span class="pill badge-${u.status === false ? "nonaktif" : "aktif"}">
-                ${u.status === false ? "⛔ Nonaktif" : "✅ Aktif"}
+            <div class="mt-1 d-flex gap-1 flex-wrap align-items-center">
+              <span class="badge ${u.role === "admin" ? "bg-primary" : "bg-secondary"}">${u.role === "admin" ? "👑 Admin" : "👤 User"}</span>
+              <span class="badge ${u.status === false ? "bg-warning text-dark" : "bg-success"}">
+                ${u.status === false ? "⏳ Menunggu Persetujuan" : "✅ Aktif"}
               </span>
             </div>
           </div>
-          <div class="d-flex gap-1 flex-shrink-0 flex-wrap justify-content-end" style="max-width:130px">
+          <div class="d-flex gap-1 flex-shrink-0 flex-wrap justify-content-end align-items-center" style="max-width:145px">
+            ${u.status === false ? `
+              <button class="btn btn-sm btn-success py-1 px-2 fw-semibold"
+                      onclick="handleToggleStatus('${u.id}', false)"
+                      title="Setujui dan aktifkan akun">
+                <i class="bi bi-check-circle me-1"></i>Setujui
+              </button>
+            ` : `
+              <button class="btn btn-sm btn-outline-warning py-0 px-2"
+                      onclick="handleToggleStatus('${u.id}', true)"
+                      title="Nonaktifkan akun">
+                <i class="bi bi-person-x"></i>
+              </button>
+            `}
             <button class="btn btn-sm btn-outline-primary py-0 px-2"
                     onclick="openRoleModal('${u.id}','${(u.nama || '').replace(/'/g, "\\'")}','${u.role || 'user'}')"
                     title="Edit role">
@@ -182,11 +195,6 @@
                     onclick="openResetModal('${u.id}')"
                     title="Reset password">
               <i class="bi bi-key"></i>
-            </button>
-            <button class="btn btn-sm ${u.status === false ? "btn-outline-success" : "btn-outline-warning"} py-0 px-2"
-                    onclick="handleToggleStatus('${u.id}', ${u.status !== false})"
-                    title="${u.status === false ? "Aktifkan" : "Nonaktifkan"}">
-              <i class="bi bi-${u.status === false ? "person-check" : "person-x"}"></i>
             </button>
             <button class="btn btn-sm btn-outline-danger py-0 px-2"
                     onclick="handleDeleteUser('${u.id}','${(u.nama || '').replace(/'/g, "\\'")}' )"
@@ -250,11 +258,12 @@
 
             // ─── Toggle status ────────────────────────────────────────
             window.handleToggleStatus = async function (email, currentStatus) {
-                const label = currentStatus ? "nonaktifkan" : "aktifkan";
-                if (!confirm(`${label.charAt(0).toUpperCase() + label.slice(1)} akun ${email}?`)) return;
+                const isPending = !currentStatus;
+                const actionText = isPending ? "Setujui dan aktifkan" : "Nonaktifkan";
+                if (!confirm(`${actionText} akun ${email}?`)) return;
                 try {
                     await toggleUserStatus(email, currentStatus);
-                    showToast(`Akun berhasil di${label}kan!`);
+                    showToast(`Akun berhasil ${isPending ? "disetujui & diaktifkan" : "dinonaktifkan"}!`);
                     renderUsers();
                 } catch (err) {
                     showToast("Gagal mengubah status: " + err.message, "error");
