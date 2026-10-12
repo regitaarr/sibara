@@ -686,7 +686,7 @@
 
         // ─── Export Excel (ALL roles) ─────────────────────────────────
         document.getElementById("btn-export").addEventListener("click", async () => {
-            if (!filteredTransaksi.length) {
+            if (!filteredTransaksi.length && !allStok.length) {
                 showToast("Tidak ada data untuk diekspor.", "warning");
                 return;
             }
