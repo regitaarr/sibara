@@ -470,6 +470,18 @@
 
             errorEl.classList.add("d-none");
 
+            // Validasi hari libur Sabtu & Minggu (tidak bisa input/output)
+            if (tanggal) {
+                const parts = tanggal.split("-").map(Number);
+                const dt = new Date(parts[0], parts[1] - 1, parts[2]);
+                const dayOfWeek = dt.getDay(); // 0 = Minggu, 6 = Sabtu
+                if (dayOfWeek === 0 || dayOfWeek === 6) {
+                    errorEl.textContent = "Tidak dapat melakukan transaksi (masuk/keluar) pada hari Sabtu dan Minggu.";
+                    errorEl.classList.remove("d-none");
+                    return;
+                }
+            }
+
             // Validasi stok keluar
             if (jenis === "keluar" && jumlah > currentStok) {
                 errorEl.textContent = `Stok tidak mencukupi! Stok terkini: ${currentStok} ${currentSatuan}. Jumlah keluar: ${jumlah}.`;

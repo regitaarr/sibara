@@ -649,6 +649,14 @@
 
             if (!data.jumlah || data.jumlah < 1) return showToast("Jumlah tidak valid.", "warning");
 
+            if (data.tanggal_transaksi) {
+                const parts = data.tanggal_transaksi.split("-").map(Number);
+                const dt = new Date(parts[0], parts[1] - 1, parts[2]);
+                if (dt.getDay() === 0 || dt.getDay() === 6) {
+                    return showToast("Transaksi tidak dapat dilakukan pada hari Sabtu dan Minggu.", "warning");
+                }
+            }
+
             const btn = document.getElementById("btn-save-txn");
             btn.disabled = true;
             try {
