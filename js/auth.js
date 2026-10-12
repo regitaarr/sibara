@@ -5,14 +5,44 @@
 import { auth, db } from "./firebase-config.js";
 import {
     signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    updateProfile,
     signOut,
     sendPasswordResetEmail,
     onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
     doc,
-    getDoc
+    getDoc,
+    setDoc,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ─── Register ────────────────────────────────────────────────
+export async function registerUser(nama, email, password) {
+    const normalizedEmail = email.trim().toLowerCase();
+    const trimmedNama = nama.trim();
+
+    // 1. Create account in Firebase Auth
+    const credential = await createUserWithEmailAndPassword(auth, normalizedEmail, password);
+    const user = credential.user;
+
+    // 2. Set displayName
+    try {
+        await updateProfile(user, { displayName: trimmedNama });
+    } catch (_) { }
+
+    // 3. Save profile document in Firestore
+    const userRef = doc(db, "users", normalizedEmail);
+    await setDoc(userRef, {
+        nama: trimmedNama,
+        role: "user",
+        status: true,
+        created_at: serverTimestamp()
+    });
+
+    return user;
+}
 
 // ─── Login ───────────────────────────────────────────────────
 export async function loginUser(email, password) {

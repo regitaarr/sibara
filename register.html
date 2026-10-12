@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIBARA | Registrasi</title>
+    <link rel="icon" type="image/png" href="assets/bps.png">
+    <meta name="description" content="Sistem Pengelolaan Barang Milik Negara (BMN) — Registrasi Pengguna">
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+    <div class="login-wrapper">
+        <div class="login-card" style="max-width: 440px;">
+            <!-- Logo -->
+            <div class="login-logo text-center mb-2">
+                <img src="assets/bps.png" alt="Logo BPS" style="height: 60px;">
+            </div>
+            <h1 class="login-title">SIBARA: Registrasi Akun</h1>
+            <p class="login-sub">Daftarkan akun baru untuk akses sistem BMN</p>
+
+            <!-- Alert -->
+            <div id="alert-box" class="alert py-2 mb-3 d-none" role="alert"></div>
+
+            <!-- Register Form -->
+            <form id="register-form" novalidate>
+
+                <!-- Nama Lengkap -->
+                <div class="mb-3">
+                    <label class="form-label" for="nama">Nama Lengkap</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="bi bi-person text-muted"></i>
+                        </span>
+                        <input type="text" id="nama" class="form-control border-start-0" placeholder="Nama Lengkap Anda"
+                            autocomplete="name" required>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label class="form-label" for="email">Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="bi bi-envelope text-muted"></i>
+                        </span>
+                        <input type="email" id="email" class="form-control border-start-0"
+                            placeholder="alamat@email.com" autocomplete="email" required>
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-3">
+                    <label class="form-label" for="password">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="bi bi-lock text-muted"></i>
+                        </span>
+                        <input type="password" id="password" class="form-control border-start-0 border-end-0"
+                            placeholder="Minimal 6 karakter" autocomplete="new-password" required minlength="6">
+                        <button type="button" id="toggle-pass" class="input-group-text bg-transparent"
+                            title="Tampilkan password">
+                            <i class="bi bi-eye text-muted" id="eye-icon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Konfirmasi Password -->
+                <div class="mb-3">
+                    <label class="form-label" for="confirm-password">Konfirmasi Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="bi bi-shield-lock text-muted"></i>
+                        </span>
+                        <input type="password" id="confirm-password" class="form-control border-start-0 border-end-0"
+                            placeholder="Ulangi password di atas" autocomplete="new-password" required minlength="6">
+                        <button type="button" id="toggle-confirm-pass" class="input-group-text bg-transparent"
+                            title="Tampilkan konfirmasi password">
+                            <i class="bi bi-eye text-muted" id="eye-confirm-icon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" id="btn-register" class="btn-bmn-primary mt-2">
+                    <span class="btn-text"><i class="bi bi-person-plus"></i> Daftar Sekarang</span>
+                    <span class="spinner d-none" id="spin-register"></span>
+                </button>
+            </form>
+
+            <!-- Back to Login -->
+            <div class="text-center mt-3 pt-3 border-top">
+                <span class="fs-sm text-muted">Sudah punya akun?</span>
+                <a href="index.html" class="fs-sm fw-bold text-decoration-none ms-1" style="color: var(--primary-lt);">
+                    Masuk di sini
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Register Logic -->
+    <script type="module" src="./js/register.js"></script>
+
+</body>
+
+</html>
