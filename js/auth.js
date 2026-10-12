@@ -141,6 +141,11 @@ export function requireAuth(requiredRole = null) {
 export function applyRoleUI(role) {
     const adminOnlyEls = document.querySelectorAll("[data-admin-only]");
     adminOnlyEls.forEach(el => {
-        el.style.display = role === "admin" ? "" : "none";
+        if (role === "admin") {
+            el.classList.remove("d-none");
+            el.style.display = "";
+        } else {
+            el.classList.add("d-none");
+        }
     });
 }

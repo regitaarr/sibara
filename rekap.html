@@ -30,6 +30,7 @@
             <img src="assets/bps.png" alt="BPS" style="height: 24px; margin-right: 8px;"> Rekap &amp; Laporan
         </div>
         <div class="d-flex align-items-center gap-2">
+            <span class="badge" id="role-badge" style="font-size: 0.8rem; padding: 5px 10px;"></span>
             <div class="user-info text-end d-none d-sm-block" id="user-display"></div>
         </div>
     </header>
@@ -289,15 +290,17 @@
         // ─── Auth ──────────────────────────────────────────────────────
         let currentRole = null;
         try {
-            const { role } = await requireAuth();
+            const { user, role } = await requireAuth();
             currentRole = role;
             applyRoleUI(role);
 
-            document.getElementById("role-badge").textContent =
-                role === "admin" ? "👑 Admin" : "👤 User";
-
-            if (role === "admin") {
-                document.getElementById("nav-users").classList.remove("d-none");
+            const roleBadge = document.getElementById("role-badge");
+            if (roleBadge) {
+                roleBadge.className = `badge ${role === "admin" ? "bg-primary" : "bg-secondary"}`;
+                roleBadge.textContent = role === "admin" ? "👑 Admin" : "👤 User";
+            }
+            if (document.getElementById("user-display") && user) {
+                document.getElementById("user-display").textContent = user.email;
             }
         } catch (_) { }
         // (Logout moved to Profil page)
