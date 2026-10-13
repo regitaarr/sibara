@@ -108,10 +108,7 @@
                 </table>
             </div>
             <!-- Pagination Controls -->
-            <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
-                <div class="text-muted fs-sm" id="stok-info"></div>
-                <div id="pagination-stok"></div>
-            </div>
+            <div id="pagination-stok" class="mt-3 d-flex justify-content-end"></div>
         </div>
 
         <!-- ─── Riwayat Transaksi ─────────────────────────────────── -->
@@ -171,10 +168,7 @@
                 </table>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
-                <div class="text-muted fs-sm" id="txn-info"></div>
-                <div id="pagination-txn"></div>
-            </div>
+            <div id="pagination-txn" class="mt-3 d-flex justify-content-end"></div>
         </div>
 
     </main>
@@ -472,16 +466,12 @@
                 tbody.innerHTML = `<tr><td colspan="5">
         <div class="empty-state"><i class="bi ${stokSearchQuery.trim() ? "bi-search" : "bi-inbox"}"></i><p>${emptyMsg}</p></div>
       </td></tr>`;
-                document.getElementById("stok-info").textContent = "Menampilkan 0 barang";
                 document.getElementById("pagination-stok").innerHTML = "";
                 return;
             }
 
             const startIndex = (stokCurrentPage - 1) * stokItemsPerPage;
             const paginatedItems = items.slice(startIndex, startIndex + stokItemsPerPage);
-            const endIndex = Math.min(startIndex + stokItemsPerPage, items.length);
-
-            document.getElementById("stok-info").innerHTML = `Menampilkan <span class="fw-bold text-dark">${startIndex + 1}–${endIndex}</span> dari total <span class="fw-bold text-dark">${items.length}</span> barang`;
 
             tbody.innerHTML = paginatedItems.map((item, idx) => {
                 const i = startIndex + idx;
@@ -618,16 +608,12 @@
             <p>Tidak ada transaksi ${labelJenis} pada periode ini.</p>
         </div>
       </td></tr>`;
-                document.getElementById("txn-info").textContent = `Menampilkan 0 transaksi ${labelJenis}`;
                 document.getElementById("pagination-txn").innerHTML = "";
                 return;
             }
 
             const startIndex = (currentPage - 1) * txnItemsPerPage;
             const paginatedItems = items.slice(startIndex, startIndex + txnItemsPerPage);
-            const endIndex = Math.min(startIndex + txnItemsPerPage, items.length);
-
-            document.getElementById("txn-info").innerHTML = `Menampilkan <span class="fw-bold text-dark">${startIndex + 1}–${endIndex}</span> dari total <span class="fw-bold text-dark">${items.length}</span> ${labelJenis}`;
 
             tbody.innerHTML = paginatedItems.map((item, idx) => {
                 const i = startIndex + idx;
