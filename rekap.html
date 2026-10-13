@@ -12,7 +12,7 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles.css?v=2">
     <!-- ExcelJS -->
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <!-- FileSaver.js -->
@@ -108,7 +108,10 @@
                 </table>
             </div>
             <!-- Pagination Controls -->
-            <div id="pagination-stok" class="mt-3"></div>
+            <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+                <div class="text-muted fs-sm" id="stok-info"></div>
+                <div id="pagination-stok"></div>
+            </div>
         </div>
 
         <!-- ─── Riwayat Transaksi ─────────────────────────────────── -->
@@ -168,7 +171,7 @@
                 </table>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
                 <div class="text-muted fs-sm" id="txn-info"></div>
                 <div id="pagination-txn"></div>
             </div>
@@ -339,38 +342,62 @@
         let activeTxnTab = "masuk"; // "masuk" | "keluar"
         const txnItemsPerPage = 10;
 
+        function getPageNumbers(currentPage, totalPages) {
+            if (totalPages <= 5) {
+                return Array.from({ length: totalPages }, (_, i) => i + 1);
+            }
+            if (currentPage <= 3) {
+                return [1, 2, 3, 4, "...", totalPages];
+            }
+            if (currentPage >= totalPages - 2) {
+                return [1, "...", totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+            }
+            return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
+        }
+
         function renderPagination(totalItems, itemsPerPage, currentPage, containerId, onPageChange) {
             const container = document.getElementById(containerId);
-            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            if (!container) return;
 
-            if (totalPages <= 1) {
+            if (!totalItems || totalItems <= 0) {
                 container.innerHTML = "";
                 return;
             }
 
-            let html = `<nav><ul class="pagination pagination-sm justify-content-end mb-0">`;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
 
-            // Prev
-            html += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link text-dark" href="#" data-page="${currentPage - 1}">&lt;</a>
+            const pageList = getPageNumbers(currentPage, totalPages);
+
+            let html = `<nav aria-label="Navigasi Halaman"><ul class="pagination-bmn justify-content-end mb-0">`;
+
+            // Tombol Prev
+            const isPrevDisabled = currentPage <= 1;
+            html += `<li class="page-item ${isPrevDisabled ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="${currentPage - 1}" title="Halaman Sebelumnya" aria-label="Sebelumnya">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
             </li>`;
 
-            // Calculate visible pages (show max 5 surrounding pages to prevent overflow)
-            let startPage = Math.max(1, currentPage - 2);
-            let endPage = Math.min(totalPages, startPage + 4);
-            if (endPage - startPage < 4) {
-                startPage = Math.max(1, endPage - 4);
-            }
+            // Tombol Angka & Dots
+            pageList.forEach(p => {
+                if (p === "...") {
+                    html += `<li class="page-item"><span class="page-dots">&hellip;</span></li>`;
+                } else {
+                    const isActive = p === currentPage;
+                    html += `<li class="page-item ${isActive ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="${p}">${p}</a>
+                    </li>`;
+                }
+            });
 
-            for (let i = startPage; i <= endPage; i++) {
-                html += `<li class="page-item ${currentPage === i ? 'active' : ''}">
-                    <a class="page-link ${currentPage === i ? 'bg-primary text-white border-primary' : 'text-dark'}" href="#" data-page="${i}">${i}</a>
-                </li>`;
-            }
-
-            // Next
-            html += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link text-dark" href="#" data-page="${currentPage + 1}">&gt;</a>
+            // Tombol Next
+            const isNextDisabled = currentPage >= totalPages;
+            html += `<li class="page-item ${isNextDisabled ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="${currentPage + 1}" title="Halaman Berikutnya" aria-label="Berikutnya">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
             </li>`;
 
             html += `</ul></nav>`;
@@ -379,9 +406,12 @@
             container.querySelectorAll('.page-link').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    if (e.target.parentElement.classList.contains('disabled')) return;
-                    const page = parseInt(e.target.getAttribute('data-page'));
-                    if (page) onPageChange(page);
+                    const parent = link.closest('.page-item');
+                    if (!parent || parent.classList.contains('disabled') || parent.classList.contains('active')) return;
+                    const page = parseInt(link.getAttribute('data-page'), 10);
+                    if (page && page >= 1 && page <= totalPages && page !== currentPage) {
+                        onPageChange(page);
+                    }
                 });
             });
         }
@@ -442,12 +472,16 @@
                 tbody.innerHTML = `<tr><td colspan="5">
         <div class="empty-state"><i class="bi ${stokSearchQuery.trim() ? "bi-search" : "bi-inbox"}"></i><p>${emptyMsg}</p></div>
       </td></tr>`;
+                document.getElementById("stok-info").textContent = "Menampilkan 0 barang";
                 document.getElementById("pagination-stok").innerHTML = "";
                 return;
             }
 
             const startIndex = (stokCurrentPage - 1) * stokItemsPerPage;
             const paginatedItems = items.slice(startIndex, startIndex + stokItemsPerPage);
+            const endIndex = Math.min(startIndex + stokItemsPerPage, items.length);
+
+            document.getElementById("stok-info").innerHTML = `Menampilkan <span class="fw-bold text-dark">${startIndex + 1}–${endIndex}</span> dari total <span class="fw-bold text-dark">${items.length}</span> barang`;
 
             tbody.innerHTML = paginatedItems.map((item, idx) => {
                 const i = startIndex + idx;
@@ -593,7 +627,7 @@
             const paginatedItems = items.slice(startIndex, startIndex + txnItemsPerPage);
             const endIndex = Math.min(startIndex + txnItemsPerPage, items.length);
 
-            document.getElementById("txn-info").textContent = `Menampilkan ${startIndex + 1}-${endIndex} dari total ${items.length} ${labelJenis}`;
+            document.getElementById("txn-info").innerHTML = `Menampilkan <span class="fw-bold text-dark">${startIndex + 1}–${endIndex}</span> dari total <span class="fw-bold text-dark">${items.length}</span> ${labelJenis}`;
 
             tbody.innerHTML = paginatedItems.map((item, idx) => {
                 const i = startIndex + idx;
