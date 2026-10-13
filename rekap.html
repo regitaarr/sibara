@@ -133,12 +133,10 @@
             <!-- Tab Switcher: Barang Masuk & Barang Keluar -->
             <div class="txn-tab-container mb-3">
                 <button type="button" class="txn-tab-btn tab-masuk active" id="tab-masuk">
-                    <i class="bi bi-arrow-down-circle"></i>
                     <span>Barang Masuk</span>
                     <span class="badge" id="badge-count-masuk">0</span>
                 </button>
                 <button type="button" class="txn-tab-btn tab-keluar" id="tab-keluar">
-                    <i class="bi bi-arrow-up-circle"></i>
                     <span>Barang Keluar</span>
                     <span class="badge" id="badge-count-keluar">0</span>
                 </button>
@@ -532,7 +530,7 @@
             document.getElementById("stat-total-txn").textContent = filteredTransaksi.length;
             const breakdownEl = document.getElementById("stat-txn-breakdown");
             if (breakdownEl) {
-                breakdownEl.innerHTML = `<span class="text-success fw-bold"><i class="bi bi-arrow-down"></i> ${filteredMasuk.length}</span> &bull; <span class="text-danger fw-bold"><i class="bi bi-arrow-up"></i> ${filteredKeluar.length}</span>`;
+                breakdownEl.innerHTML = `<span class="text-success fw-bold">${filteredMasuk.length} Masuk</span> &bull; <span class="text-danger fw-bold">${filteredKeluar.length} Keluar</span>`;
             }
 
             renderActiveTab();
@@ -582,7 +580,7 @@
             if (!items.length) {
                 tbody.innerHTML = `<tr><td colspan="8">
         <div class="empty-state">
-            <i class="bi ${isMasuk ? 'bi-box-arrow-in-down text-success' : 'bi-box-arrow-up text-danger'}"></i>
+            <i class="bi bi-inbox"></i>
             <p>Tidak ada transaksi ${labelJenis} pada periode ini.</p>
         </div>
       </td></tr>`;
@@ -615,7 +613,7 @@
         <td class="fw-600">${item.nama_barang || "—"}</td>
         <td>
           <span class="pill ${isMasuk ? 'badge-masuk' : 'badge-keluar'} fw-600">
-            ${isMasuk ? '↓ +' : '↑ -'}${item.jumlah ?? 0} ${item.satuan || ""}
+            ${item.jumlah ?? 0} ${item.satuan || ""}
           </span>
         </td>
         <td class="text-center">

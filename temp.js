@@ -162,7 +162,7 @@
             if (!items.length) {
                 tbody.innerHTML = `<tr><td colspan="8">
         <div class="empty-state">
-            <i class="bi ${isMasuk ? 'bi-box-arrow-in-down text-success' : 'bi-box-arrow-up text-danger'}"></i>
+            <i class="bi bi-inbox"></i>
             <p>Tidak ada transaksi ${labelJenis} pada periode ini.</p>
         </div>
       </td></tr>`;
@@ -181,7 +181,7 @@
         <td class="fw-600">${item.nama_barang || "—"}</td>
         <td>
           <span class="pill ${isMasuk ? 'badge-masuk' : 'badge-keluar'} fw-600">
-            ${isMasuk ? '↓ +' : '↑ -'}${item.jumlah ?? 0} ${item.satuan || ""}
+            ${item.jumlah ?? 0} ${item.satuan || ""}
           </span>
         </td>
         <td class="text-center">
