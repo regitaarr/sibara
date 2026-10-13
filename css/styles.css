@@ -308,6 +308,69 @@ span.badge-jenis, span.pill {
   font-weight: 600;
 }
 
+/* ─── Riwayat Transaksi Tabs ─────────────────────────────────── */
+.txn-tab-container {
+  display: flex;
+  background: var(--surface-2);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  gap: 4px;
+}
+.txn-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: .6rem .85rem;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: .85rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.txn-tab-btn:hover {
+  color: var(--text);
+  background: rgba(0, 0, 0, .04);
+}
+.txn-tab-btn .badge {
+  font-size: .72rem;
+  padding: .2rem .55rem;
+  border-radius: 99px;
+  font-weight: 700;
+  transition: all var(--transition);
+}
+.txn-tab-btn.tab-masuk .badge {
+  background: #D1FAE5;
+  color: #065F46;
+}
+.txn-tab-btn.tab-keluar .badge {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+.txn-tab-btn.active.tab-masuk {
+  background: #10B981;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, .35);
+}
+.txn-tab-btn.active.tab-masuk .badge {
+  background: rgba(255, 255, 255, .25);
+  color: #fff;
+}
+.txn-tab-btn.active.tab-keluar {
+  background: #EF4444;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, .35);
+}
+.txn-tab-btn.active.tab-keluar .badge {
+  background: rgba(255, 255, 255, .25);
+  color: #fff;
+}
+
 /* ─── Login page ─────────────────────────────────────────────── */
 .login-wrapper {
   min-height: 100vh;

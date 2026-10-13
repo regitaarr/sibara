@@ -111,41 +111,79 @@
                     return d.getFullYear() === y && d.getMonth() + 1 === m;
                 });
             }
+            filteredMasuk = filteredTransaksi.filter(t => t.jenis === "masuk");
+            filteredKeluar = filteredTransaksi.filter(t => t.jenis === "keluar");
+            document.getElementById("badge-count-masuk").textContent = filteredMasuk.length;
+            document.getElementById("badge-count-keluar").textContent = filteredKeluar.length;
             document.getElementById("stat-total-txn").textContent = filteredTransaksi.length;
-            renderTransaksi(filteredTransaksi);
+            renderActiveTab();
         }
 
         document.getElementById("btn-filter").addEventListener("click", applyMonthFilter);
 
-        function renderTransaksi(items) {
+        // Tab click listeners
+        document.getElementById("tab-masuk").addEventListener("click", () => {
+            if (activeTxnTab === "masuk") return;
+            activeTxnTab = "masuk";
+            renderActiveTab();
+        });
+
+        document.getElementById("tab-keluar").addEventListener("click", () => {
+            if (activeTxnTab === "keluar") return;
+            activeTxnTab = "keluar";
+            renderActiveTab();
+        });
+
+        function updateTabUI() {
+            const btnMasuk = document.getElementById("tab-masuk");
+            const btnKeluar = document.getElementById("tab-keluar");
+            const thJumlah = document.getElementById("th-jumlah");
+
+            if (activeTxnTab === "masuk") {
+                btnMasuk.classList.add("active");
+                btnKeluar.classList.remove("active");
+                if (thJumlah) thJumlah.textContent = "Jumlah Masuk";
+            } else {
+                btnKeluar.classList.add("active");
+                btnMasuk.classList.remove("active");
+                if (thJumlah) thJumlah.textContent = "Jumlah Keluar";
+            }
+        }
+
+        function renderActiveTab() {
+            updateTabUI();
+            const isMasuk = activeTxnTab === "masuk";
+            const items = isMasuk ? filteredMasuk : filteredKeluar;
             const tbody = document.getElementById("tbody-transaksi");
             const isAdmin = currentRole === "admin";
-            document.getElementById("txn-info").textContent = `Menampilkan ${items.length} transaksi`;
+            const labelJenis = isMasuk ? "barang masuk" : "barang keluar";
+            document.getElementById("txn-info").textContent = `Menampilkan ${items.length} ${labelJenis}`;
 
             if (!items.length) {
-                tbody.innerHTML = `<tr><td colspan="9">
-        <div class="empty-state"><i class="bi bi-inbox"></i><p>Tidak ada transaksi pada periode ini.</p></div>
+                tbody.innerHTML = `<tr><td colspan="8">
+        <div class="empty-state">
+            <i class="bi ${isMasuk ? 'bi-box-arrow-in-down text-success' : 'bi-box-arrow-up text-danger'}"></i>
+            <p>Tidak ada transaksi ${labelJenis} pada periode ini.</p>
+        </div>
       </td></tr>`;
                 return;
             }
 
             tbody.innerHTML = items.map((item, i) => {
-                // YYYY-MM-DD format for input date value if needed
                 const d = item.tanggal_transaksi?.toDate ? item.tanggal_transaksi.toDate() : new Date(item.tanggal_transaksi);
-                const isoDate = d.toISOString().split("T")[0];
+                const isoDate = !isNaN(d.getTime()) ? d.toISOString().split("T")[0] : "";
 
                 return `
       <tr>
         <td>${i + 1}</td>
         <td class="text-nowrap">${formatTanggal(item.tanggal_transaksi)}</td>
-        <td class="text-muted fs-sm">${item.kode_barcode || "—"}</td>
+        <td class="text-muted fs-sm font-monospace">${item.kode_barcode || "—"}</td>
         <td class="fw-600">${item.nama_barang || "—"}</td>
         <td>
-          <span class="pill badge-jenis badge-${item.jenis}">
-            ${item.jenis === "masuk" ? "↓ Masuk" : "↑ Keluar"}
+          <span class="pill ${isMasuk ? 'badge-masuk' : 'badge-keluar'} fw-600">
+            ${isMasuk ? '↓ +' : '↑ -'}${item.jumlah ?? 0} ${item.satuan || ""}
           </span>
         </td>
-        <td class="text-end fw-600">${item.jumlah ?? 0} ${item.satuan || ""}</td>
         <td class="text-center">
           ${item.foto_url
                         ? `<button class="btn btn-sm btn-light border py-0 px-2 text-primary" onclick="showPhoto('${item.foto_url}')" title="Lihat Foto">
@@ -163,7 +201,7 @@
             </button>
             ${isAdmin ? `
             <button class="btn btn-sm btn-outline-danger py-0 px-2"
-                    onclick="handleDeleteTransaksi('${item.id}', '${(item.nama_barang || "").replace(/'/g, "\\'")}', '${item.jenis}')"
+                    onclick="handleDeleteTransaksi('${item.id}', '${(item.nama_barang || "").replace(/'/g, "\\'")}', '${item.jenis}', ${item.jumlah || 0}, '${(item.satuan || "").replace(/'/g, "\\'")}')"
                     title="Hapus transaksi">
               <i class="bi bi-trash3"></i>
             </button>` : ""}
