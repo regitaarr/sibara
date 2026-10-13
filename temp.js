@@ -264,11 +264,16 @@
             }
         };
 
-        window.handleDeleteTransaksi = async function (id, nama, jenis) {
-            if (!confirm(`Hapus transaksi "${jenis}" untuk "${nama}"?\n\nPeringatan: stok TIDAK otomatis dikembalikan.`)) return;
+        window.handleDeleteTransaksi = async function (id, nama, jenis, jumlah = 0, satuan = "") {
+            const detailQty = jumlah ? ` (${jumlah} ${satuan || ""})` : "";
+            const efekStok = jenis === "masuk"
+                ? "Stok barang akan otomatis dikurangi kembali."
+                : "Stok barang akan otomatis ditambahkan kembali.";
+
+            if (!confirm(`Hapus transaksi "${jenis}" untuk "${nama}"${detailQty}?\n\nCatatan: ${efekStok}`)) return;
             try {
                 await deleteTransaksi(id);
-                showToast("Transaksi berhasil dihapus.");
+                showToast("Transaksi berhasil dihapus dan stok barang telah dikembalikan.");
             } catch (err) {
                 showToast("Gagal menghapus transaksi: " + err.message, "error");
             }

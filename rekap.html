@@ -290,7 +290,7 @@
         import {
             listenStok, listenTransaksi, formatTanggal,
             deleteTransaksi, deleteBarang, updateBarang, updateTransaksi, renameBarang
-        } from "./js/rekap.js?v=2";
+        } from "./js/rekap.js?v=3";
         import { exportToExcel } from "./js/excel-export.js?v=3";
 
         // ─── Toast helper ─────────────────────────────────────────────
@@ -568,7 +568,7 @@
             </button>
             ${isAdmin ? `
             <button class="btn btn-sm btn-outline-danger py-0 px-2"
-                    onclick="handleDeleteTransaksi('${item.id}', '${(item.nama_barang || "").replace(/'/g, "\\'")}', '${item.jenis}')"
+                    onclick="handleDeleteTransaksi('${item.id}', '${(item.nama_barang || "").replace(/'/g, "\\'")}', '${item.jenis}', ${item.jumlah || 0}, '${(item.satuan || "").replace(/'/g, "\\'")}')"
                     title="Hapus transaksi">
               <i class="bi bi-trash3"></i>
             </button>` : ""}
@@ -682,11 +682,16 @@
             }
         };
 
-        window.handleDeleteTransaksi = async function (id, nama, jenis) {
-            if (!confirm(`Hapus transaksi "${jenis}" untuk "${nama}"?\n\nPeringatan: stok TIDAK otomatis dikembalikan.`)) return;
+        window.handleDeleteTransaksi = async function (id, nama, jenis, jumlah = 0, satuan = "") {
+            const detailQty = jumlah ? ` (${jumlah} ${satuan || ""})` : "";
+            const efekStok = jenis === "masuk"
+                ? "Stok barang akan otomatis dikurangi kembali."
+                : "Stok barang akan otomatis ditambahkan kembali.";
+
+            if (!confirm(`Hapus transaksi "${jenis}" untuk "${nama}"${detailQty}?\n\nCatatan: ${efekStok}`)) return;
             try {
                 await deleteTransaksi(id);
-                showToast("Transaksi berhasil dihapus.");
+                showToast("Transaksi berhasil dihapus dan stok barang telah dikembalikan.");
             } catch (err) {
                 showToast("Gagal menghapus transaksi: " + err.message, "error");
             }

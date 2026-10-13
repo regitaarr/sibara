@@ -69,7 +69,47 @@ export function formatTanggal(ts) {
 
 // ─── Delete transaksi (admin only) ────────────────────────────
 export async function deleteTransaksi(id) {
-    await deleteDoc(doc(db, "transaksi", id));
+    const tRef = doc(db, "transaksi", id);
+    return await runTransaction(db, async (txn) => {
+        const tSnap = await txn.get(tRef);
+        if (!tSnap.exists()) {
+            throw new Error("Data transaksi tidak ditemukan!");
+        }
+
+        const oldData = tSnap.data();
+        const jumlah = Number(oldData.jumlah) || 0;
+        const jenis = oldData.jenis;
+
+        // Kembalikan stok di master barang ke kondisi awal sebelum transaksi
+        if (oldData.kode_barcode) {
+            const bRef = doc(db, "barang", oldData.kode_barcode);
+            const bSnap = await txn.get(bRef);
+
+            if (bSnap.exists()) {
+                let stok = Number(bSnap.data().stok_terkini ?? 0);
+
+                // Revert stock:
+                // - Jika transaksi masuk, kurangi kembali stoknya
+                // - Jika transaksi keluar, tambahkan kembali stoknya
+                if (jenis === "masuk") {
+                    stok -= jumlah;
+                    if (stok < 0) {
+                        throw new Error(`Gagal: menghapus transaksi masuk ini akan membuat stok menjadi negatif (${stok}).`);
+                    }
+                } else if (jenis === "keluar") {
+                    stok += jumlah;
+                }
+
+                txn.update(bRef, {
+                    stok_terkini: stok,
+                    last_updated: serverTimestamp()
+                });
+            }
+        }
+
+        // Hapus dokumen transaksi
+        txn.delete(tRef);
+    });
 }
 
 // ─── Delete barang (admin only) ───────────────────────────────
