@@ -474,6 +474,8 @@ span.badge-jenis, span.pill {
 .login-logo i { font-size: 28px; color: var(--primary); }
 .login-title  { text-align: center; font-size: 1.3rem; font-weight: 700; color: var(--primary); }
 .login-sub    { text-align: center; font-size: .82rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+#btn-forgot   { text-decoration: none !important; }
+#btn-forgot:hover { text-decoration: none !important; color: var(--primary) !important; }
 
 /* ─── Alerts / Toast ─────────────────────────────────────────── */
 .toast-container {
