@@ -2,8 +2,8 @@
 // excel-export.js
 // Export Laporan BMN ke Excel dengan 3 Sheet terstruktur:
 // 1. Neraca Barang (Matriks Tanggal Keluar & Masuk, Sabtu-Minggu Blok Hitam)
-// 2. Arus Masuk (Detail Barang Masuk & Foto Bukti Fisik di Sel)
-// 3. Arus Keluar (Detail Barang Keluar & Foto Bukti Fisik di Sel)
+// 2. Rekap Masuk (Detail Barang Masuk & Foto Bukti Fisik di Sel)
+// 3. Rekap Keluar (Detail Barang Keluar & Foto Bukti Fisik di Sel)
 // ============================================================
 
 export async function exportToExcel(transaksiBulanData, bulanStr, allStok = [], allTransaksi = []) {
@@ -147,7 +147,7 @@ export async function exportToExcel(transaksiBulanData, bulanStr, allStok = [], 
     };
 
     // ============================================================
-    // 📝 SHEET 1: Neraca Barang (Matriks Tanggal Keluar & Masuk)
+    // SHEET 1: Neraca Barang (Matriks Tanggal Keluar & Masuk)
     // ============================================================
     const ws1 = workbook.addWorksheet("Neraca Barang", {
         views: [{ showGridLines: true }],
@@ -477,9 +477,9 @@ export async function exportToExcel(transaksiBulanData, bulanStr, allStok = [], 
 
 
     // ============================================================
-    // 📥 SHEET 2: Arus Masuk (Detail Barang Masuk)
+    // SHEET 2: Rekap Masuk (Detail Barang Masuk)
     // ============================================================
-    const ws2 = workbook.addWorksheet("Arus Masuk", {
+    const ws2 = workbook.addWorksheet("Rekap Masuk", {
         views: [{ showGridLines: true }],
         properties: { tabColor: { argb: "FF10B981" } }
     });
@@ -497,7 +497,7 @@ export async function exportToExcel(transaksiBulanData, bulanStr, allStok = [], 
 
     ws2.mergeCells("A1:H1");
     const title2 = ws2.getCell("A1");
-    title2.value = `BUKU PEMBANTU BARANG MASUK (ARUS MASUK)`;
+    title2.value = `REKAPITULASI BARANG MASUK`;
     title2.font = { name: "Arial", size: 14, bold: true, color: { argb: "FF065F46" } };
     title2.alignment = { vertical: "middle", horizontal: "center" };
     ws2.getRow(1).height = 26;
@@ -622,9 +622,9 @@ export async function exportToExcel(transaksiBulanData, bulanStr, allStok = [], 
 
 
     // ============================================================
-    // 📤 SHEET 3: Arus Keluar (Detail Barang Keluar)
+    // SHEET 3: Rekap Keluar (Detail Barang Keluar)
     // ============================================================
-    const ws3 = workbook.addWorksheet("Arus Keluar", {
+    const ws3 = workbook.addWorksheet("Rekap Keluar", {
         views: [{ showGridLines: true }],
         properties: { tabColor: { argb: "FFEF4444" } }
     });
@@ -642,7 +642,7 @@ export async function exportToExcel(transaksiBulanData, bulanStr, allStok = [], 
 
     ws3.mergeCells("A1:H1");
     const title3 = ws3.getCell("A1");
-    title3.value = `BUKU PEMBANTU BARANG KELUAR (ARUS KELUAR)`;
+    title3.value = `REKAPITULASI BARANG KELUAR`;
     title3.font = { name: "Arial", size: 14, bold: true, color: { argb: "FF991B1B" } };
     title3.alignment = { vertical: "middle", horizontal: "center" };
     ws3.getRow(1).height = 26;
