@@ -830,8 +830,8 @@ async function embedPhotoInCell(workbook, worksheet, photoUrl, colIndex, rowInde
         if (base64) {
             const imageId = workbook.addImage({ base64, extension: ext });
             worksheet.addImage(imageId, {
-                tl: { col: colIndex - 1 + 0.05, row: rowIndex - 1 + 0.05 },
-                br: { col: colIndex - 0.05, row: rowIndex - 0.05 },
+                tl: { col: colIndex - 1, row: rowIndex - 1 },
+                br: { col: colIndex, row: rowIndex },
                 editAs: "oneCell"
             });
         }
