@@ -23,7 +23,7 @@
             applyRoleUI(role);
 
             document.getElementById("role-badge").textContent =
-                role === "admin" ? "👑 Admin" : "👤 User";
+                role === "admin" ? "Admin" : "User";
 
             if (role === "admin") {
                 document.getElementById("nav-users").classList.remove("d-none");

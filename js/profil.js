@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const roleBadge = document.getElementById("profil-role-badge");
         if (roleBadge) {
             roleBadge.className = `badge ${currentRole === "admin" ? "bg-primary" : "bg-secondary"}`;
-            roleBadge.textContent = currentRole === "admin" ? "👑 Admin" : "👤 User";
+            roleBadge.textContent = currentRole === "admin" ? "Admin" : "User";
         }
         applyRoleUI(currentRole);
         loadProfileData();
