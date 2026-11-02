@@ -462,12 +462,16 @@ span.badge-jenis, span.pill {
 }
 .login-logo {
   width: 64px; height: 64px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  background: rgba(238, 238, 238, 0.8); /* #EEEEEE dengan efek blur */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 16px;
   display: grid; place-items: center;
   margin: 0 auto 1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
-.login-logo i { font-size: 28px; color: #fff; }
+.login-logo i { font-size: 28px; color: var(--primary); }
 .login-title  { text-align: center; font-size: 1.3rem; font-weight: 700; color: var(--primary); }
 .login-sub    { text-align: center; font-size: .82rem; color: var(--text-muted); margin-bottom: 1.5rem; }
 
